@@ -1,0 +1,53 @@
+﻿using System;
+
+namespace MicroServicio.RedCar.DataAccess.Entities
+{
+    public class CiudadEntity
+    {
+        // =========================
+        // CLAVE PRIMARIA
+        // =========================
+        public int id_ciudad { get; set; }
+
+        // =========================
+        // CLAVE FORÁNEA
+        // =========================
+        public int id_pais { get; set; }
+
+        // =========================
+        // CAMPOS PRINCIPALES
+        // =========================
+        public Guid ciudad_guid { get; set; }
+
+        public string nombre_ciudad { get; set; } = null!;
+
+        // =========================
+        // ESTADO / CICLO DE VIDA
+        // =========================
+        public string estado_ciudad { get; set; } = null!;
+        public bool es_eliminado { get; set; }
+
+        // =========================
+        // AUDITORÍA
+        // =========================
+        public DateTime fecha_registro_utc { get; set; }
+        public string creado_por_usuario { get; set; } = null!;
+
+        public string? modificado_por_usuario { get; set; }
+        public DateTime? fecha_modificacion_utc { get; set; }
+        public string? modificado_desde_ip { get; set; }
+
+        public DateTime? fecha_inhabilitacion_utc { get; set; }
+        public string? motivo_inhabilitacion { get; set; }
+
+        // =========================
+        // CONCURRENCIA
+        // =========================
+        public byte[] row_version { get; set; } = null!;
+
+        // =========================
+        // INTEGRACIÓN / ORIGEN
+        // =========================
+        public string origen_registro { get; set; } = null!;
+    }
+}

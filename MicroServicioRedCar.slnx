@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="MicroServicio.RedCar.Api/MicroServicio.RedCar.Api.csproj" Id="906d031b-add3-4a0e-a337-d7fd25b365c2" />
+    <Project Path="MicroServicio.RedCar.Business/MicroServicio.RedCar.Business.csproj" />
+    <Project Path="MicroServicio.RedCar.DataAccess/MicroServicio.RedCar.DataAccess.csproj" />
+    <Project Path="MicroServicio.RedCar.DataManagment/MicroServicio.RedCar.DataManagment.csproj" />
+  </Folder>
+  <Folder Name="/test/" />
+</Solution>
