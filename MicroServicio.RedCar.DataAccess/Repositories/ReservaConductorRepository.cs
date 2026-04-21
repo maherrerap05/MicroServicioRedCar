@@ -65,6 +65,17 @@ namespace MicroServicio.RedCar.DataAccess.Repositories
                 .ToListAsync(cancellationToken);
         }
 
+        // CORRECCIÓN: devuelve todos los conductores de la reserva incluyendo eliminados.
+        // Necesario para detectar conductores previamente removidos y reactivarlos
+        // en lugar de insertar un duplicado que violaría UQ_RES_X_CON_RESERVA_CONDUCTOR.
+        public async Task<IReadOnlyList<ReservaConductorEntity>> ObtenerTodosPorReservaAsync(int id_reserva, CancellationToken cancellationToken = default)
+        {
+            return await _context.ReservasConductores
+                .Where(r => r.id_reserva == id_reserva)
+                .OrderBy(r => r.id_reserva_conductor)
+                .ToListAsync(cancellationToken);
+        }
+
         // =========================
         // COMANDOS
         // =========================

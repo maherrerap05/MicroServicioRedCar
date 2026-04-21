@@ -48,6 +48,11 @@ namespace MicroServicio.RedCar.DataManagement.Interfaces
             string? motivo,
             CancellationToken cancellationToken = default);
 
+        Task AprobarConductoresYExtrasAsync(
+            int id_reserva,
+            string modificado_por_usuario,
+            CancellationToken cancellationToken = default);
+
         // =========================
         // VALIDACIONES
         // =========================

@@ -19,6 +19,10 @@ namespace MicroServicio.RedCar.DataAccess.Repositories.Interfaces
 
         Task<IReadOnlyList<ReservaExtraEntity>> ObtenerPorReservaAsync(int id_reserva, CancellationToken cancellationToken = default);
 
+        // CORRECCIÓN: incluye eliminados para evitar violación de UQ_RES_X_XTRAS_RESERVA_EXTRA
+        // al reactivar un extra que fue removido previamente de la reserva.
+        Task<IReadOnlyList<ReservaExtraEntity>> ObtenerTodosPorReservaAsync(int id_reserva, CancellationToken cancellationToken = default);
+
         // =========================
         // COMANDOS
         // =========================

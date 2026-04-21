@@ -36,7 +36,6 @@ namespace MicroServicio.RedCar.Business.Mappers
                 fecha_inicio = fechaHoraRecogida,
                 fecha_fin = fechaHoraDevolucion,
 
-                edad_conductor_principal = request.edad_conductor_principal,
                 cantidad_dias_reserva = (int)Math.Ceiling((fechaHoraDevolucion - fechaHoraRecogida).TotalDays),
 
                 observaciones_reserva = request.observaciones_reserva,
@@ -77,7 +76,6 @@ namespace MicroServicio.RedCar.Business.Mappers
                 fecha_inicio = fechaHoraRecogida,
                 fecha_fin = fechaHoraDevolucion,
 
-                edad_conductor_principal = request.edad_conductor_principal,
                 cantidad_dias_reserva = (int)Math.Ceiling((fechaHoraDevolucion - fechaHoraRecogida).TotalDays),
 
                 observaciones_reserva = request.observaciones_reserva,
@@ -148,17 +146,21 @@ namespace MicroServicio.RedCar.Business.Mappers
             };
         }
 
-        public static ReservaExtraDataModel ToDataModel(ReservaExtraRequest request, int idReserva)
+        public static ReservaExtraDataModel ToDataModel(
+            ReservaExtraRequest request,
+            int idReserva,
+            decimal valorUnitario)  // ← recibe el precio desde afuera
         {
+            var subtotal = valorUnitario * request.cantidad;  
+
             return new ReservaExtraDataModel
             {
                 id_reserva = idReserva,
                 id_extra = request.id_extra,
-
                 cantidad = request.cantidad,
-
+                valor_unitario_extra = valorUnitario,   
+                subtotal_extra = subtotal,              
                 estado_reserva_extra = request.estado_reserva_extra,
-
                 fecha_registro_utc = DateTime.UtcNow,
                 creado_por_usuario = request.creado_por_usuario,
                 modificado_desde_ip = request.modificado_desde_ip,
@@ -196,7 +198,6 @@ namespace MicroServicio.RedCar.Business.Mappers
                 fecha_inicio = model.fecha_inicio,
                 fecha_fin = model.fecha_fin,
 
-                edad_conductor_principal = model.edad_conductor_principal,
                 cantidad_dias_reserva = model.cantidad_dias_reserva,
 
                 subtotal_reserva = model.subtotal_reserva,

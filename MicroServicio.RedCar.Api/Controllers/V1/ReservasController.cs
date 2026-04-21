@@ -11,7 +11,7 @@ namespace MicroServicio.RedCar.Api.Controllers.V1;
 [ApiController]
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/reservas")]
-[Authorize(Roles = "ADMIN,VENDEDOR")]
+[Authorize]  // solo exige autenticación a nivel de clase, los roles se definen por método
 public class ReservasController : ControllerBase
 {
     private readonly IReservaService _reservaService;
@@ -22,10 +22,26 @@ public class ReservasController : ControllerBase
     }
 
     // =========================
+    // MÉTODO AUXILIAR
+    // =========================
+
+    /// <summary>
+    /// Lee el claim id_cliente del JWT del usuario autenticado.
+    /// Devuelve null si el usuario no tiene cliente asociado (ADMIN/VENDEDOR).
+    /// </summary>
+    private int? ObtenerIdClienteDelToken()
+    {
+        var claim = User.FindFirst("id_cliente")?.Value;
+        return int.TryParse(claim, out var id) ? id : null;
+    }
+
+    // =========================
     // CONSULTAS
     // =========================
 
+    // Solo personal interno
     [HttpGet]
+    [Authorize(Roles = "ADMIN,VENDEDOR")]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<ReservaResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> ObtenerTodos(CancellationToken cancellationToken)
     {
@@ -34,46 +50,96 @@ public class ReservasController : ControllerBase
         return Ok(ApiResponse<IReadOnlyList<ReservaResponse>>.Ok(result, "Consulta exitosa."));
     }
 
+    // ADMIN + VENDEDOR + CLIENTE
+    // El cliente solo puede ver reservas que le pertenecen
     [HttpGet("{id:int}")]
+    [Authorize(Roles = "ADMIN,VENDEDOR,CLIENTE")]
     [ProducesResponseType(typeof(ApiResponse<ReservaResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ObtenerPorId(int id, CancellationToken cancellationToken)
     {
         var result = await _reservaService.ObtenerPorIdAsync(id, cancellationToken);
 
+        if (User.IsInRole("CLIENTE"))
+        {
+            var idClienteToken = ObtenerIdClienteDelToken();
+
+            if (idClienteToken is null || result.id_cliente != idClienteToken)
+                return Forbid();
+        }
+
         return Ok(ApiResponse<ReservaResponse>.Ok(result, "Consulta exitosa."));
     }
 
+    // ADMIN + VENDEDOR + CLIENTE
+    // El cliente solo puede ver reservas que le pertenecen
     [HttpGet("guid/{reservaGuid:guid}")]
+    [Authorize(Roles = "ADMIN,VENDEDOR,CLIENTE")]
     [ProducesResponseType(typeof(ApiResponse<ReservaResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ObtenerPorGuid(Guid reservaGuid, CancellationToken cancellationToken)
     {
         var result = await _reservaService.ObtenerPorGuidAsync(reservaGuid, cancellationToken);
 
+        if (User.IsInRole("CLIENTE"))
+        {
+            var idClienteToken = ObtenerIdClienteDelToken();
+
+            if (idClienteToken is null || result.id_cliente != idClienteToken)
+                return Forbid();
+        }
+
         return Ok(ApiResponse<ReservaResponse>.Ok(result, "Consulta exitosa."));
     }
 
+    // ADMIN + VENDEDOR + CLIENTE
+    // El cliente solo puede ver reservas que le pertenecen
     [HttpGet("codigo/{codigoReserva}")]
+    [Authorize(Roles = "ADMIN,VENDEDOR,CLIENTE")]
     [ProducesResponseType(typeof(ApiResponse<ReservaResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ObtenerPorCodigo(string codigoReserva, CancellationToken cancellationToken)
     {
         var result = await _reservaService.ObtenerPorCodigoAsync(codigoReserva, cancellationToken);
 
+        if (User.IsInRole("CLIENTE"))
+        {
+            var idClienteToken = ObtenerIdClienteDelToken();
+
+            if (idClienteToken is null || result.id_cliente != idClienteToken)
+                return Forbid();
+        }
+
         return Ok(ApiResponse<ReservaResponse>.Ok(result, "Consulta exitosa."));
     }
 
+    // ADMIN + VENDEDOR + CLIENTE
+    // El cliente solo puede consultar su propio historial
     [HttpGet("cliente/{idCliente:int}/historial")]
+    [Authorize(Roles = "ADMIN,VENDEDOR,CLIENTE")]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<ReservaResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> ObtenerHistorialPorCliente(int idCliente, CancellationToken cancellationToken)
     {
+        if (User.IsInRole("CLIENTE"))
+        {
+            var idClienteToken = ObtenerIdClienteDelToken();
+
+            if (idClienteToken is null || idClienteToken != idCliente)
+                return Forbid();
+        }
+
         var result = await _reservaService.ObtenerHistorialPorClienteAsync(idCliente, cancellationToken);
 
         return Ok(ApiResponse<IReadOnlyList<ReservaResponse>>.Ok(result, "Consulta de historial exitosa."));
     }
 
+    // Solo personal interno
     [HttpGet("activas")]
+    [Authorize(Roles = "ADMIN,VENDEDOR")]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<ReservaResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> ObtenerReservasActivas(CancellationToken cancellationToken)
     {
@@ -82,7 +148,9 @@ public class ReservasController : ControllerBase
         return Ok(ApiResponse<IReadOnlyList<ReservaResponse>>.Ok(result, "Consulta de reservas activas exitosa."));
     }
 
+    // Solo personal interno
     [HttpGet("vehiculo/{idVehiculo:int}")]
+    [Authorize(Roles = "ADMIN,VENDEDOR")]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<ReservaResponse>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> ObtenerReservasPorVehiculo(int idVehiculo, CancellationToken cancellationToken)
     {
@@ -91,7 +159,9 @@ public class ReservasController : ControllerBase
         return Ok(ApiResponse<IReadOnlyList<ReservaResponse>>.Ok(result, "Consulta por vehículo exitosa."));
     }
 
+    // Solo personal interno
     [HttpPost("buscar")]
+    [Authorize(Roles = "ADMIN,VENDEDOR")]
     [ProducesResponseType(typeof(ApiResponse<DataPagedResult<ReservaResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Buscar([FromBody] ReservaFiltroRequest request, CancellationToken cancellationToken)
@@ -105,7 +175,9 @@ public class ReservasController : ControllerBase
     // COMANDOS
     // =========================
 
+    // ADMIN + VENDEDOR + CLIENTE
     [HttpPost]
+    [Authorize(Roles = "ADMIN,VENDEDOR,CLIENTE")]
     [ProducesResponseType(typeof(ApiResponse<ReservaResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Crear([FromBody] CrearReservaRequest request, CancellationToken cancellationToken)
@@ -115,22 +187,35 @@ public class ReservasController : ControllerBase
             User.FindFirst("unique_name")?.Value ??
             "api_user";
 
+        // CORRECCIÓN: si es CLIENTE, forzar que solo pueda crear reservas
+        // para su propio id_cliente, ignorando el que venga en el body.
+        // El id_cliente se toma directamente del JWT para evitar suplantación.
+        if (User.IsInRole("CLIENTE"))
+        {
+            var idClienteToken = ObtenerIdClienteDelToken();
+
+            if (idClienteToken is null)
+                return Forbid();
+
+            request.id_cliente = idClienteToken.Value;
+        }
+
         request.creado_por_usuario = usuario;
         request.modificacion_ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-        request.servicio_origen = "MicroServicio.RedCar.Api";
+        request.servicio_origen = "API";
 
         foreach (var conductor in request.conductores)
         {
             conductor.creado_por_usuario = usuario;
             conductor.modificado_desde_ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-            conductor.origen_registro = "MicroServicio.RedCar.Api";
+            conductor.origen_registro = "API";
         }
 
         foreach (var extra in request.extras)
         {
             extra.creado_por_usuario = usuario;
             extra.modificado_desde_ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-            extra.origen_registro = "MicroServicio.RedCar.Api";
+            extra.origen_registro = "API";
         }
 
         var result = await _reservaService.CrearAsync(request, cancellationToken);
@@ -138,7 +223,9 @@ public class ReservasController : ControllerBase
         return Ok(ApiResponse<ReservaResponse>.Ok(result, "Reserva creada exitosamente."));
     }
 
+    // Solo personal interno
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "ADMIN,VENDEDOR")]
     [ProducesResponseType(typeof(ApiResponse<ReservaResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
@@ -152,20 +239,20 @@ public class ReservasController : ControllerBase
         request.id_reserva = id;
         request.modificado_por_usuario = usuario;
         request.modificacion_ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-        request.servicio_origen = "MicroServicio.RedCar.Api";
+        request.servicio_origen = "API";
 
         foreach (var conductor in request.conductores)
         {
             conductor.creado_por_usuario = usuario;
             conductor.modificado_desde_ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-            conductor.origen_registro = "MicroServicio.RedCar.Api";
+            conductor.origen_registro = "API";
         }
 
         foreach (var extra in request.extras)
         {
             extra.creado_por_usuario = usuario;
             extra.modificado_desde_ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-            extra.origen_registro = "MicroServicio.RedCar.Api";
+            extra.origen_registro = "API";
         }
 
         var result = await _reservaService.ActualizarAsync(request, cancellationToken);
@@ -173,7 +260,9 @@ public class ReservasController : ControllerBase
         return Ok(ApiResponse<ReservaResponse>.Ok(result, "Reserva actualizada exitosamente."));
     }
 
+    // Solo personal interno
     [HttpPost("{id:int}/confirmar")]
+    [Authorize(Roles = "ADMIN,VENDEDOR")]
     [ProducesResponseType(typeof(ApiResponse<ReservaResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
@@ -187,7 +276,7 @@ public class ReservasController : ControllerBase
                 User.FindFirst("unique_name")?.Value ??
                 "api_user",
             modificacion_ip = HttpContext.Connection.RemoteIpAddress?.ToString(),
-            servicio_origen = "MicroServicio.RedCar.Api"
+            servicio_origen = "API"
         };
 
         var result = await _reservaService.ConfirmarAsync(request, cancellationToken);
@@ -195,31 +284,11 @@ public class ReservasController : ControllerBase
         return Ok(ApiResponse<ReservaResponse>.Ok(result, "Reserva confirmada exitosamente."));
     }
 
-    [HttpPost("{id:int}/cancelar")]
-    [ProducesResponseType(typeof(ApiResponse<ReservaResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Cancelar(
-        int id,
-        [FromBody] CancelarReservaRequest request,
-        CancellationToken cancellationToken)
-    {
-        request.id_reserva = id;
-        request.modificado_por_usuario =
-            User.Identity?.Name ??
-            User.FindFirst("unique_name")?.Value ??
-            "api_user";
-        request.modificacion_ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-        request.servicio_origen = "MicroServicio.RedCar.Api";
-
-        var result = await _reservaService.CancelarAsync(request, cancellationToken);
-
-        return Ok(ApiResponse<ReservaResponse>.Ok(result, "Reserva cancelada exitosamente."));
-    }
-
+    // Solo ADMIN
     [HttpDelete("{id:int}")]
     [Authorize(Roles = "ADMIN")]
     [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> EliminarLogico(int id, [FromQuery] string? motivo, CancellationToken cancellationToken)
     {

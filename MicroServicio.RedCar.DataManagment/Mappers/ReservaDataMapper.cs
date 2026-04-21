@@ -35,7 +35,6 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
                 fecha_hora_recogida = entity.fecha_hora_recogida,
                 fecha_hora_devolucion = entity.fecha_hora_devolucion,
 
-                edad_conductor_principal = entity.edad_conductor_principal,
                 cantidad_dias_reserva = entity.cantidad_dias_reserva,
 
                 subtotal_reserva = entity.subtotal_reserva,
@@ -97,7 +96,6 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
                 fecha_hora_recogida = model.fecha_hora_recogida,
                 fecha_hora_devolucion = model.fecha_hora_devolucion,
 
-                edad_conductor_principal = model.edad_conductor_principal,
                 cantidad_dias_reserva = model.cantidad_dias_reserva,
 
                 subtotal_reserva = model.subtotal_reserva,

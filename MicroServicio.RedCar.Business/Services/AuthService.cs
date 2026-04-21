@@ -31,7 +31,7 @@ namespace MicroServicio.RedCar.Business.Services
             if (!usuario.activo)
                 throw new UnauthorizedBusinessException("El usuario se encuentra inactivo.");
 
-            // V1 temporal
+            // V1 temporal — en V2 implementar hashing real con BCrypt
             if (usuario.password_hash != request.Password)
                 throw new UnauthorizedBusinessException("Usuario o contraseña inválidos.");
 
@@ -40,11 +40,18 @@ namespace MicroServicio.RedCar.Business.Services
                 UserName = usuario.username,
                 Correo = usuario.correo,
                 Activo = usuario.activo,
+
+                // AGREGADO: se incluye id_cliente en el response para que el AuthController
+                // lo agregue como claim al JWT. Es 0 para ADMIN/VENDEDOR sin cliente asociado,
+                // por lo que se convierte a null para evitar claims inválidos.
+                IdCliente = usuario.id_cliente > 0 ? usuario.id_cliente : null,
+
                 Roles = usuario.UsuarioRoles
                     .Where(ur => ur.activo && !ur.es_eliminado && ur.estado_usuario_rol == "ACT")
                     .Select(ur => ur.Rol.nombre_rol)
                     .Distinct()
                     .ToList(),
+
                 Token = string.Empty,
                 ExpirationUtc = DateTime.MinValue
             };

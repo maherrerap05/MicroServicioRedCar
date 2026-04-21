@@ -37,7 +37,7 @@ namespace MicroServicio.RedCar.DataAccess.Queries
         {
             var query = _context.Reservas
                 .AsNoTracking()
-                .Where(r => !r.es_eliminado);
+                .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(codigo_reserva))
             {

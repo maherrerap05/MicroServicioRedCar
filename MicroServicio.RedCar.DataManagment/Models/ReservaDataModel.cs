@@ -41,7 +41,6 @@
         // =========================
         // DATOS OPERATIVOS
         // =========================
-        public byte edad_conductor_principal { get; set; }
         public int cantidad_dias_reserva { get; set; }
 
         // =========================

@@ -196,6 +196,25 @@ namespace MicroServicio.RedCar.DataManagement.Services
             return VehiculoDataMapper.ToDataModel(entity);
         }
 
+        public async Task<bool> ActualizarLocalizacionAsync(
+            int id_vehiculo,
+            int id_localizacion,
+            string modificado_por_usuario,
+            CancellationToken cancellationToken = default)
+        {
+            var resultado = await _unitOfWork.VehiculoRepository.ActualizarLocalizacionAsync(
+                id_vehiculo,
+                id_localizacion,
+                modificado_por_usuario,
+                cancellationToken);
+
+            if (!resultado)
+                return false;
+
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            return true;
+        }
         public async Task<bool> EliminarLogicoAsync(int id_vehiculo, string usuario, string? motivo, CancellationToken cancellationToken = default)
         {
             var entity = await _unitOfWork.VehiculoRepository.ObtenerParaActualizarAsync(id_vehiculo, cancellationToken);

@@ -201,7 +201,6 @@ namespace MicroServicio.RedCar.DataManagement.Services
             entity.fecha_hora_recogida = model.fecha_hora_recogida;
             entity.fecha_hora_devolucion = model.fecha_hora_devolucion;
 
-            entity.edad_conductor_principal = model.edad_conductor_principal;
             entity.cantidad_dias_reserva = model.cantidad_dias_reserva;
 
             entity.subtotal_reserva = model.subtotal_reserva;
@@ -226,16 +225,20 @@ namespace MicroServicio.RedCar.DataManagement.Services
 
             entity.servicio_origen = model.servicio_origen;
 
-            _unitOfWork.ReservaRepository.Actualizar(entity);
+            // EF Core detecta los cambios automáticamente — no se llama a Actualizar()
+            // porque la entidad ya está siendo tracked por el contexto.
 
             // =========================
             // SINCRONIZAR EXTRAS
             // =========================
             if (extras is not null)
             {
-                var existentes = await _unitOfWork.ReservaExtraRepository.ObtenerPorReservaAsync(model.id_reserva, cancellationToken);
+                // Incluye eliminados para poder reactivarlos sin violar UQ_RES_X_XTRAS_RESERVA_EXTRA
+                var existentes = await _unitOfWork.ReservaExtraRepository
+                    .ObtenerTodosPorReservaAsync(model.id_reserva, cancellationToken);
 
-                foreach (var existente in existentes)
+                // Marcar como inactivos los extras que ya no vienen en el request
+                foreach (var existente in existentes.Where(x => !x.es_eliminado))
                 {
                     var recibido = extras.FirstOrDefault(x => x.id_extra == existente.id_extra);
 
@@ -259,7 +262,7 @@ namespace MicroServicio.RedCar.DataManagement.Services
                     existente.es_eliminado = recibido.es_eliminado;
                     existente.fecha_inhabilitacion_utc = recibido.fecha_inhabilitacion_utc;
                     existente.motivo_inhabilitacion = recibido.motivo_inhabilitacion;
-                    existente.modificado_por_usuario = recibido.modificado_por_usuario;
+                    existente.modificado_por_usuario = model.modificado_por_usuario;
                     existente.fecha_modificacion_utc = recibido.fecha_modificacion_utc;
                     existente.modificado_desde_ip = recibido.modificado_desde_ip;
                     existente.origen_registro = recibido.origen_registro;
@@ -267,13 +270,35 @@ namespace MicroServicio.RedCar.DataManagement.Services
                     _unitOfWork.ReservaExtraRepository.Actualizar(existente);
                 }
 
+                // Insertar nuevos o reactivar eliminados
                 foreach (var extraNuevo in extras)
                 {
-                    var yaExiste = existentes.Any(x => x.id_extra == extraNuevo.id_extra);
+                    var existente = existentes.FirstOrDefault(x => x.id_extra == extraNuevo.id_extra);
 
-                    if (yaExiste)
+                    // Ya fue procesado arriba como activo
+                    if (existente is not null && !existente.es_eliminado)
                         continue;
 
+                    // Reactivar extra eliminado en lugar de insertar duplicado
+                    if (existente is not null && existente.es_eliminado)
+                    {
+                        existente.cantidad = extraNuevo.cantidad;
+                        existente.valor_unitario_extra = extraNuevo.valor_unitario_extra;
+                        existente.subtotal_extra = extraNuevo.subtotal_extra;
+                        existente.estado_reserva_extra = extraNuevo.estado_reserva_extra;
+                        existente.es_eliminado = false;
+                        existente.fecha_inhabilitacion_utc = null;
+                        existente.motivo_inhabilitacion = null;
+                        existente.modificado_por_usuario = model.modificado_por_usuario;
+                        existente.fecha_modificacion_utc = DateTime.UtcNow;
+                        existente.modificado_desde_ip = extraNuevo.modificado_desde_ip;
+                        existente.origen_registro = extraNuevo.origen_registro;
+
+                        _unitOfWork.ReservaExtraRepository.Actualizar(existente);
+                        continue;
+                    }
+
+                    // Extra completamente nuevo — insertar
                     var extraEntity = ReservaExtraDataMapper.ToEntity(extraNuevo);
                     extraEntity.id_reserva = model.id_reserva;
 
@@ -286,9 +311,12 @@ namespace MicroServicio.RedCar.DataManagement.Services
             // =========================
             if (conductores is not null)
             {
-                var existentes = await _unitOfWork.ReservaConductorRepository.ObtenerPorReservaAsync(model.id_reserva, cancellationToken);
+                // Incluye eliminados para poder reactivarlos sin violar UQ_RES_X_CON_RESERVA_CONDUCTOR
+                var existentes = await _unitOfWork.ReservaConductorRepository
+                    .ObtenerTodosPorReservaAsync(model.id_reserva, cancellationToken);
 
-                foreach (var existente in existentes)
+                // Marcar como inactivos los conductores que ya no vienen en el request
+                foreach (var existente in existentes.Where(x => !x.es_eliminado))
                 {
                     var recibido = conductores.FirstOrDefault(x => x.id_conductor == existente.id_conductor);
 
@@ -312,7 +340,7 @@ namespace MicroServicio.RedCar.DataManagement.Services
                     existente.es_eliminado = recibido.es_eliminado;
                     existente.fecha_inhabilitacion_utc = recibido.fecha_inhabilitacion_utc;
                     existente.motivo_inhabilitacion = recibido.motivo_inhabilitacion;
-                    existente.modificado_por_usuario = recibido.modificado_por_usuario;
+                    existente.modificado_por_usuario = model.modificado_por_usuario;
                     existente.fecha_modificacion_utc = recibido.fecha_modificacion_utc;
                     existente.modificado_desde_ip = recibido.modificado_desde_ip;
                     existente.origen_registro = recibido.origen_registro;
@@ -320,13 +348,35 @@ namespace MicroServicio.RedCar.DataManagement.Services
                     _unitOfWork.ReservaConductorRepository.Actualizar(existente);
                 }
 
+                // Insertar nuevos o reactivar eliminados
                 foreach (var conductorNuevo in conductores)
                 {
-                    var yaExiste = existentes.Any(x => x.id_conductor == conductorNuevo.id_conductor);
+                    var existente = existentes.FirstOrDefault(x => x.id_conductor == conductorNuevo.id_conductor);
 
-                    if (yaExiste)
+                    // Ya fue procesado arriba como activo
+                    if (existente is not null && !existente.es_eliminado)
                         continue;
 
+                    // Reactivar conductor eliminado en lugar de insertar duplicado
+                    if (existente is not null && existente.es_eliminado)
+                    {
+                        existente.tipo_conductor = conductorNuevo.tipo_conductor;
+                        existente.es_principal = conductorNuevo.es_principal;
+                        existente.fecha_asignacion_utc = conductorNuevo.fecha_asignacion_utc;
+                        existente.estado_reserva_conductor = conductorNuevo.estado_reserva_conductor;
+                        existente.es_eliminado = false;
+                        existente.fecha_inhabilitacion_utc = null;
+                        existente.motivo_inhabilitacion = null;
+                        existente.modificado_por_usuario = model.modificado_por_usuario;
+                        existente.fecha_modificacion_utc = DateTime.UtcNow;
+                        existente.modificado_desde_ip = conductorNuevo.modificado_desde_ip;
+                        existente.origen_registro = conductorNuevo.origen_registro;
+
+                        _unitOfWork.ReservaConductorRepository.Actualizar(existente);
+                        continue;
+                    }
+
+                    // Conductor completamente nuevo — insertar
                     var conductorEntity = ReservaConductorDataMapper.ToEntity(conductorNuevo);
                     conductorEntity.id_reserva = model.id_reserva;
 
@@ -350,14 +400,21 @@ namespace MicroServicio.RedCar.DataManagement.Services
             if (entity is null)
                 return false;
 
-            entity.estado_reserva = "INA";
+            // CORRECCIÓN: se usa estado CAN en lugar de INA porque el constraint
+            // CHK_RESERVAS_ESTADO solo permite: PEN, CON, CAN, EXP, FIN, EMI.
+            // Los constraints CHK_RESERVAS_CANCELACION_MOTIVO_COHERENTE y
+            // CHK_RESERVAS_CANCELACION_FECHA_COHERENTE exigen que cuando el estado
+            // es CAN, motivo_cancelacion y fecha_cancelacion_utc no sean nulos.
+            entity.estado_reserva = "CAN";
+            entity.motivo_cancelacion = motivo;
+            entity.fecha_cancelacion_utc = DateTime.UtcNow;
             entity.es_eliminado = true;
             entity.fecha_inhabilitacion_utc = DateTime.UtcNow;
             entity.fecha_modificacion_utc = DateTime.UtcNow;
             entity.modificado_por_usuario = usuario;
             entity.motivo_inhabilitacion = motivo;
 
-            _unitOfWork.ReservaRepository.Actualizar(entity);
+            // EF Core detecta los cambios automáticamente — no se llama a Actualizar()
 
             var extras = await _unitOfWork.ReservaExtraRepository.ObtenerPorReservaAsync(id_reserva, cancellationToken);
             foreach (var extra in extras)
@@ -388,6 +445,38 @@ namespace MicroServicio.RedCar.DataManagement.Services
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return true;
+        }
+
+        public async Task AprobarConductoresYExtrasAsync(
+            int id_reserva,
+            string modificado_por_usuario,
+            CancellationToken cancellationToken = default)
+        {
+            var conductores = await _unitOfWork.ReservaConductorRepository
+                .ObtenerPorReservaAsync(id_reserva, cancellationToken);
+
+            foreach (var conductor in conductores)
+            {
+                conductor.estado_reserva_conductor = "APR";
+                conductor.modificado_por_usuario = modificado_por_usuario;
+                conductor.fecha_modificacion_utc = DateTime.UtcNow;
+
+                _unitOfWork.ReservaConductorRepository.Actualizar(conductor);
+            }
+
+            var extras = await _unitOfWork.ReservaExtraRepository
+                .ObtenerPorReservaAsync(id_reserva, cancellationToken);
+
+            foreach (var extra in extras)
+            {
+                extra.estado_reserva_extra = "APR";
+                extra.modificado_por_usuario = modificado_por_usuario;
+                extra.fecha_modificacion_utc = DateTime.UtcNow;
+
+                _unitOfWork.ReservaExtraRepository.Actualizar(extra);
+            }
+
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
 
         // =========================

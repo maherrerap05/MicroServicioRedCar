@@ -19,6 +19,10 @@ namespace MicroServicio.RedCar.DataAccess.Repositories.Interfaces
 
         Task<IReadOnlyList<ReservaConductorEntity>> ObtenerPorReservaAsync(int id_reserva, CancellationToken cancellationToken = default);
 
+        // CORRECCIÓN: incluye eliminados para evitar violación de UQ_RES_X_CON_RESERVA_CONDUCTOR
+        // al reactivar un conductor que fue removido previamente de la reserva.
+        Task<IReadOnlyList<ReservaConductorEntity>> ObtenerTodosPorReservaAsync(int id_reserva, CancellationToken cancellationToken = default);
+
         // =========================
         // COMANDOS
         // =========================

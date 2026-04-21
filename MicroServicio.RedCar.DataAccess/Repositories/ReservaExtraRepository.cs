@@ -65,6 +65,17 @@ namespace MicroServicio.RedCar.DataAccess.Repositories
                 .ToListAsync(cancellationToken);
         }
 
+        // CORRECCIÓN: devuelve todos los extras de la reserva incluyendo eliminados.
+        // Necesario para detectar extras previamente removidos y reactivarlos
+        // en lugar de insertar un duplicado que violaría UQ_RES_X_XTRAS_RESERVA_EXTRA.
+        public async Task<IReadOnlyList<ReservaExtraEntity>> ObtenerTodosPorReservaAsync(int id_reserva, CancellationToken cancellationToken = default)
+        {
+            return await _context.ReservasExtras
+                .Where(r => r.id_reserva == id_reserva)
+                .OrderBy(r => r.id_reserva_extra)
+                .ToListAsync(cancellationToken);
+        }
+
         // =========================
         // COMANDOS
         // =========================

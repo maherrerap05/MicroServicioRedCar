@@ -28,7 +28,6 @@ namespace MicroServicio.RedCar.Business.DTOs.Reserva
         public DateTime fecha_inicio { get; set; }
         public DateTime fecha_fin { get; set; }
 
-        public byte edad_conductor_principal { get; set; }
         public int cantidad_dias_reserva { get; set; }
 
         public decimal subtotal_reserva { get; set; }

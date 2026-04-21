@@ -11,8 +11,8 @@ namespace MicroServicio.RedCar.Business.DTOs.Reserva
 
         public string estado_reserva_conductor { get; set; } = "ACT";
 
-        public string creado_por_usuario { get; set; } = null!;
+        public string? creado_por_usuario { get; set; }
         public string? modificado_desde_ip { get; set; }
-        public string origen_registro { get; set; } = null!;
+        public string? origen_registro { get; set; }
     }
 }

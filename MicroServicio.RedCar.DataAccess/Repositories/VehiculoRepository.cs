@@ -73,6 +73,27 @@ namespace MicroServicio.RedCar.DataAccess.Repositories
             _context.Vehiculos.Update(vehiculo);
         }
 
+        public async Task<bool> ActualizarLocalizacionAsync(
+            int id_vehiculo,
+            int id_localizacion,
+            string modificado_por_usuario,
+            CancellationToken cancellationToken = default)
+        {
+            var entity = await _context.Vehiculos
+                .FirstOrDefaultAsync(v => v.id_vehiculo == id_vehiculo && !v.es_eliminado, cancellationToken);
+
+            if (entity is null)
+                return false;
+
+            entity.localizacion_actual = id_localizacion;
+            entity.modificado_por_usuario = modificado_por_usuario;
+            entity.fecha_modificacion_utc = DateTime.UtcNow;
+
+            _context.Vehiculos.Update(entity);
+
+            return true;
+        }
+
         // =========================
         // VALIDACIONES
         // =========================

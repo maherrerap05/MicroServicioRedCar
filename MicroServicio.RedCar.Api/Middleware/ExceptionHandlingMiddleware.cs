@@ -8,10 +8,12 @@ namespace MicroServicio.RedCar.Api.Middleware;
 public class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly ILogger<ExceptionHandlingMiddleware> _logger;
 
-    public ExceptionHandlingMiddleware(RequestDelegate next)
+    public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
     {
         _next = next;
+        _logger = logger;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -48,12 +50,23 @@ public class ExceptionHandlingMiddleware
                 HttpStatusCode.BadRequest,
                 ApiErrorResponse.Fail(ex.Message));
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            // ── TEMPORAL DEBUG ───────────────────────────────────────────────
+            // Expone el error real para diagnóstico. Revertir antes de producción.
+            _logger.LogError(ex, "Error interno no controlado en {Method} {Path}",
+                context.Request.Method,
+                context.Request.Path);
+
+            var mensaje = $"{ex.GetType().Name}: {ex.Message}";
+
+            if (ex.InnerException is not null)
+                mensaje += $" | Inner: {ex.InnerException.GetType().Name}: {ex.InnerException.Message}";
+
             await WriteErrorAsync(
                 context,
                 HttpStatusCode.InternalServerError,
-                ApiErrorResponse.Fail("Ha ocurrido un error interno en el servidor."));
+                ApiErrorResponse.Fail(mensaje));
         }
     }
 

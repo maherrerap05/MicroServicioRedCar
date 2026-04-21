@@ -46,7 +46,6 @@ namespace MicroServicio.RedCar.DataAccess.Entities
         // =========================
         // DATOS PROPIOS DEL DOMINIO
         // =========================
-        public byte edad_conductor_principal { get; set; }
         public int cantidad_dias_reserva { get; set; }
 
         public decimal subtotal_reserva { get; set; }

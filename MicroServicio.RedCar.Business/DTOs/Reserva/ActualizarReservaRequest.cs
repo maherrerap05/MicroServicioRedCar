@@ -20,15 +20,13 @@ namespace MicroServicio.RedCar.Business.DTOs.Reserva
         public DateTime fecha_devolucion { get; set; }
         public TimeSpan hora_devolucion { get; set; }
 
-        public byte edad_conductor_principal { get; set; }
-
         public string? observaciones_reserva { get; set; }
         public string origen_canal_reserva { get; set; } = null!;
         public string estado_reserva { get; set; } = null!;
 
-        public string modificado_por_usuario { get; set; } = null!;
+        public string? modificado_por_usuario { get; set; }
         public string? modificacion_ip { get; set; }
-        public string servicio_origen { get; set; } = null!;
+        public string? servicio_origen { get; set; }
 
         public string? motivo_cancelacion { get; set; }
         public string? motivo_inhabilitacion { get; set; }

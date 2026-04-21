@@ -57,12 +57,6 @@ namespace MicroServicio.RedCar.Business.Validators
                     errors.Add("La fecha y hora de devolución deben ser mayores que la fecha y hora de recogida.");
             }
 
-            if (request.edad_conductor_principal < 18)
-                errors.Add("La edad del conductor principal no puede ser menor a 18 años.");
-
-            if (request.edad_conductor_principal > 100)
-                errors.Add("La edad del conductor principal no puede ser mayor a 100 años.");
-
             if (!string.IsNullOrWhiteSpace(request.observaciones_reserva) &&
                 request.observaciones_reserva.Trim().Length > 300)
             {
@@ -221,12 +215,6 @@ namespace MicroServicio.RedCar.Business.Validators
                 if (fechaHoraDevolucion <= fechaHoraRecogida)
                     errors.Add("La fecha y hora de devolución deben ser mayores que la fecha y hora de recogida.");
             }
-
-            if (request.edad_conductor_principal < 18)
-                errors.Add("La edad del conductor principal no puede ser menor a 18 años.");
-
-            if (request.edad_conductor_principal > 100)
-                errors.Add("La edad del conductor principal no puede ser mayor a 100 años.");
 
             if (!string.IsNullOrWhiteSpace(request.observaciones_reserva) &&
                 request.observaciones_reserva.Trim().Length > 300)

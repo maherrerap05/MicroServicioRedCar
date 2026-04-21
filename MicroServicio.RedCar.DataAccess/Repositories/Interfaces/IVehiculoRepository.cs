@@ -26,6 +26,12 @@ namespace MicroServicio.RedCar.DataAccess.Repositories.Interfaces
 
         void Actualizar(VehiculoEntity vehiculo);
 
+        Task<bool> ActualizarLocalizacionAsync(
+            int id_vehiculo,
+            int id_localizacion,
+            string modificado_por_usuario,
+            CancellationToken cancellationToken = default);
+
         // =========================
         // VALIDACIONES
         // =========================

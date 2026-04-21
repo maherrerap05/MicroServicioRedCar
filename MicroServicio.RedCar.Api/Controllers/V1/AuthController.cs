@@ -38,10 +38,19 @@ public class AuthController : ControllerBase
 
         var claims = new List<Claim>
         {
-            new(JwtRegisteredClaimNames.Sub, result.UserName),
+            new(JwtRegisteredClaimNames.Sub,        result.UserName),
             new(JwtRegisteredClaimNames.UniqueName, result.UserName),
-            new(JwtRegisteredClaimNames.Email, result.Correo ?? string.Empty)
+            new(JwtRegisteredClaimNames.Email,      result.Correo ?? string.Empty)
         };
+
+        // AGREGADO: incluir id_cliente como claim solo si el usuario tiene cliente asociado.
+        // Los usuarios ADMIN y VENDEDOR no tienen id_cliente, por lo que IdCliente es null.
+        // Este claim es leído en ReservasController para restringir el acceso del CLIENTE
+        // únicamente a sus propias reservas.
+        if (result.IdCliente.HasValue)
+        {
+            claims.Add(new Claim("id_cliente", result.IdCliente.Value.ToString()));
+        }
 
         claims.AddRange(result.Roles.Select(role => new Claim(ClaimTypes.Role, role)));
 

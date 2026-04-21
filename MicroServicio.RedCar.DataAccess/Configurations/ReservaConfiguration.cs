@@ -15,8 +15,6 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
             {
                 tb.HasCheckConstraint("CHK_RESERVAS_ESTADO", "estado_reserva IN ('PEN', 'CON', 'CAN', 'EXP', 'FIN', 'EMI')");
                 tb.HasCheckConstraint("CHK_RESERVAS_ELIMINADO", "es_eliminado IN (0,1)");
-                tb.HasCheckConstraint("CHK_RESERVAS_EDAD_CONDUCTOR", "edad_conductor_principal >= 18");
-                tb.HasCheckConstraint("CHK_RESERVAS_EDAD_CONDUCTOR_MAXIMA", "edad_conductor_principal <= 100");
                 tb.HasCheckConstraint("CHK_RESERVAS_CANTIDAD_DIAS", "cantidad_dias_reserva >= 1");
                 tb.HasCheckConstraint("CHK_RESERVAS_SUBTOTAL", "subtotal_reserva >= 0");
                 tb.HasCheckConstraint("CHK_RESERVAS_IVA", "valor_iva >= 0");
@@ -149,9 +147,6 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
             // =========================
             // DATOS PROPIOS DEL DOMINIO
             // =========================
-            builder.Property(r => r.edad_conductor_principal)
-                   .IsRequired()
-                   .HasColumnType("tinyint");
 
             builder.Property(r => r.cantidad_dias_reserva)
                    .IsRequired();

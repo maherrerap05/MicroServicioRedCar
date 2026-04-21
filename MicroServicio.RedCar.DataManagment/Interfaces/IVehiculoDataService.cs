@@ -47,6 +47,12 @@ namespace MicroServicio.RedCar.DataManagement.Interfaces
 
         Task<bool> EliminarLogicoAsync(int id_vehiculo, string usuario, string? motivo, CancellationToken cancellationToken = default);
 
+        Task<bool> ActualizarLocalizacionAsync(
+            int id_vehiculo,
+            int id_localizacion,
+            string modificado_por_usuario,
+            CancellationToken cancellationToken = default);
+
         // =========================
         // VALIDACIONES
         // =========================

@@ -14,8 +14,6 @@ namespace MicroServicio.RedCar.Business.Interfaces
 
         Task<ReservaResponse> ConfirmarAsync(ConfirmarReservaRequest request, CancellationToken cancellationToken = default);
 
-        Task<ReservaResponse> CancelarAsync(CancelarReservaRequest request, CancellationToken cancellationToken = default);
-
         Task EliminarLogicoAsync(int id_reserva, string usuario, string? motivo, CancellationToken cancellationToken = default);
 
         // =========================
