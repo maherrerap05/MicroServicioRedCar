@@ -143,6 +143,7 @@ public class FacturasController : ControllerBase
     }
 
     [HttpPost("{id:int}/aprobar")]
+    [Authorize(Roles = "ADMIN")]                                          // ← solo ADMIN puede aprobar
     [ProducesResponseType(typeof(ApiResponse<FacturaResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
@@ -165,6 +166,7 @@ public class FacturasController : ControllerBase
     }
 
     [HttpPost("{id:int}/anular")]
+    [Authorize(Roles = "ADMIN")]                                          // ← solo ADMIN puede anular
     [ProducesResponseType(typeof(ApiResponse<FacturaResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
@@ -187,7 +189,7 @@ public class FacturasController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = "ADMIN")]
+    [Authorize(Roles = "ADMIN")]                                          // ← ya estaba correcto
     [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> EliminarLogico(int id, CancellationToken cancellationToken)

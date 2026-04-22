@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using MicroServicio.RedCar.Business.DTOs.Factura;
+﻿using MicroServicio.RedCar.Business.DTOs.Factura;
 
 namespace MicroServicio.RedCar.Business.Validators
 {
@@ -22,23 +20,16 @@ namespace MicroServicio.RedCar.Business.Validators
             if (request.numero_factura != null && request.numero_factura.Trim().Length > 40)
                 errors.Add("El número de factura no puede exceder 40 caracteres.");
 
-            if (request.id_cliente <= 0)
-                errors.Add("El cliente es obligatorio.");
-
             if (request.id_reserva <= 0)
                 errors.Add("La reserva es obligatoria.");
 
             if (!string.IsNullOrWhiteSpace(request.observaciones_factura) &&
                 request.observaciones_factura.Trim().Length > 300)
-            {
                 errors.Add("Las observaciones de la factura no pueden exceder 300 caracteres.");
-            }
 
             if (!string.IsNullOrWhiteSpace(request.origen_canal_factura) &&
                 request.origen_canal_factura.Trim().Length > 50)
-            {
                 errors.Add("El origen del canal de la factura no puede exceder 50 caracteres.");
-            }
 
             if (string.IsNullOrWhiteSpace(request.estado))
                 errors.Add("El estado de la factura es obligatorio.");
@@ -47,9 +38,7 @@ namespace MicroServicio.RedCar.Business.Validators
                 request.estado != "ABI" &&
                 request.estado != "APR" &&
                 request.estado != "INA")
-            {
                 errors.Add("El estado de la factura debe ser ABI, APR o INA.");
-            }
 
             if (string.IsNullOrWhiteSpace(request.creado_por_usuario))
                 errors.Add("El usuario creador es obligatorio.");
@@ -59,9 +48,7 @@ namespace MicroServicio.RedCar.Business.Validators
 
             if (!string.IsNullOrWhiteSpace(request.modificacion_ip) &&
                 request.modificacion_ip.Trim().Length > 45)
-            {
                 errors.Add("La IP de modificación no puede exceder 45 caracteres.");
-            }
 
             if (string.IsNullOrWhiteSpace(request.servicio_origen))
                 errors.Add("El servicio de origen es obligatorio.");
@@ -94,23 +81,18 @@ namespace MicroServicio.RedCar.Business.Validators
             if (request.numero_factura != null && request.numero_factura.Trim().Length > 40)
                 errors.Add("El número de factura no puede exceder 40 caracteres.");
 
-            if (request.id_cliente <= 0)
-                errors.Add("El cliente es obligatorio.");
+            // id_cliente eliminado: se deriva automáticamente de la reserva
 
             if (request.id_reserva <= 0)
                 errors.Add("La reserva es obligatoria.");
 
             if (!string.IsNullOrWhiteSpace(request.observaciones_factura) &&
                 request.observaciones_factura.Trim().Length > 300)
-            {
                 errors.Add("Las observaciones de la factura no pueden exceder 300 caracteres.");
-            }
 
             if (!string.IsNullOrWhiteSpace(request.origen_canal_factura) &&
                 request.origen_canal_factura.Trim().Length > 50)
-            {
                 errors.Add("El origen del canal de la factura no puede exceder 50 caracteres.");
-            }
 
             if (string.IsNullOrWhiteSpace(request.estado))
                 errors.Add("El estado de la factura es obligatorio.");
@@ -119,9 +101,7 @@ namespace MicroServicio.RedCar.Business.Validators
                 request.estado != "ABI" &&
                 request.estado != "APR" &&
                 request.estado != "INA")
-            {
                 errors.Add("El estado de la factura debe ser ABI, APR o INA.");
-            }
 
             if (string.IsNullOrWhiteSpace(request.modificado_por_usuario))
                 errors.Add("El usuario modificador es obligatorio.");
@@ -131,9 +111,7 @@ namespace MicroServicio.RedCar.Business.Validators
 
             if (!string.IsNullOrWhiteSpace(request.modificacion_ip) &&
                 request.modificacion_ip.Trim().Length > 45)
-            {
                 errors.Add("La IP de modificación no puede exceder 45 caracteres.");
-            }
 
             if (string.IsNullOrWhiteSpace(request.servicio_origen))
                 errors.Add("El servicio de origen es obligatorio.");
@@ -148,16 +126,12 @@ namespace MicroServicio.RedCar.Business.Validators
 
                 if (!string.IsNullOrWhiteSpace(request.motivo_inhabilitacion) &&
                     request.motivo_inhabilitacion.Trim().Length > 250)
-                {
                     errors.Add("El motivo de inhabilitación no puede exceder 250 caracteres.");
-                }
             }
 
             if ((request.estado == "ABI" || request.estado == "APR") &&
                 !string.IsNullOrWhiteSpace(request.motivo_inhabilitacion))
-            {
                 errors.Add("No debe enviarse motivo de inhabilitación cuando el estado no es INA.");
-            }
 
             return errors;
         }
@@ -174,9 +148,7 @@ namespace MicroServicio.RedCar.Business.Validators
 
             if (!string.IsNullOrWhiteSpace(request.numero_factura) &&
                 request.numero_factura.Trim().Length > 40)
-            {
                 errors.Add("El número de factura no puede exceder 40 caracteres.");
-            }
 
             if (request.id_cliente.HasValue && request.id_cliente.Value <= 0)
                 errors.Add("El cliente debe ser mayor que cero.");
@@ -186,29 +158,21 @@ namespace MicroServicio.RedCar.Business.Validators
 
             if (request.fecha_emision_desde.HasValue && request.fecha_emision_hasta.HasValue &&
                 request.fecha_emision_desde.Value > request.fecha_emision_hasta.Value)
-            {
                 errors.Add("La fecha de emisión desde no puede ser mayor que la fecha de emisión hasta.");
-            }
 
             if (!string.IsNullOrWhiteSpace(request.origen_canal_factura) &&
                 request.origen_canal_factura.Trim().Length > 50)
-            {
                 errors.Add("El origen del canal de la factura no puede exceder 50 caracteres.");
-            }
 
             if (!string.IsNullOrWhiteSpace(request.estado) &&
                 request.estado != "ABI" &&
                 request.estado != "APR" &&
                 request.estado != "INA")
-            {
                 errors.Add("El estado del filtro debe ser ABI, APR o INA.");
-            }
 
             if (!string.IsNullOrWhiteSpace(request.servicio_origen) &&
                 request.servicio_origen.Trim().Length > 50)
-            {
                 errors.Add("El servicio de origen no puede exceder 50 caracteres.");
-            }
 
             if (request.page_number <= 0)
                 errors.Add("El número de página debe ser mayor que cero.");
@@ -243,9 +207,7 @@ namespace MicroServicio.RedCar.Business.Validators
 
             if (!string.IsNullOrWhiteSpace(request.modificacion_ip) &&
                 request.modificacion_ip.Trim().Length > 45)
-            {
                 errors.Add("La IP de modificación no puede exceder 45 caracteres.");
-            }
 
             if (string.IsNullOrWhiteSpace(request.servicio_origen))
                 errors.Add("El servicio de origen es obligatorio.");
@@ -283,9 +245,7 @@ namespace MicroServicio.RedCar.Business.Validators
 
             if (!string.IsNullOrWhiteSpace(request.modificacion_ip) &&
                 request.modificacion_ip.Trim().Length > 45)
-            {
                 errors.Add("La IP de modificación no puede exceder 45 caracteres.");
-            }
 
             if (string.IsNullOrWhiteSpace(request.servicio_origen))
                 errors.Add("El servicio de origen es obligatorio.");

@@ -30,7 +30,7 @@ namespace MicroServicio.RedCar.DataAccess.Repositories
         {
             return await _context.Facturas
                 .AsNoTracking()
-                .FirstOrDefaultAsync(f => f.id_factura == id_factura && !f.es_eliminado, cancellationToken);
+                .FirstOrDefaultAsync(f => f.id_factura == id_factura, cancellationToken);
         }
 
         public async Task<FacturaEntity?> ObtenerParaActualizarAsync(int id_factura, CancellationToken cancellationToken = default)
@@ -43,7 +43,7 @@ namespace MicroServicio.RedCar.DataAccess.Repositories
         {
             return await _context.Facturas
                 .AsNoTracking()
-                .FirstOrDefaultAsync(f => f.guid_factura == guid_factura && !f.es_eliminado, cancellationToken);
+                .FirstOrDefaultAsync(f => f.guid_factura == guid_factura, cancellationToken);
         }
 
         // =========================

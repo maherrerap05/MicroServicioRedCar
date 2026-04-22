@@ -1,5 +1,4 @@
-﻿using System;
-using MicroServicio.RedCar.Business.DTOs.Factura;
+﻿using MicroServicio.RedCar.Business.DTOs.Factura;
 using MicroServicio.RedCar.DataManagement.Models;
 
 namespace MicroServicio.RedCar.Business.Mappers
@@ -12,7 +11,7 @@ namespace MicroServicio.RedCar.Business.Mappers
             {
                 numero_factura = request.numero_factura,
 
-                id_cliente = request.id_cliente,
+                // id_cliente y montos eliminados: se asignan desde la reserva en FacturaService
                 id_reserva = request.id_reserva,
 
                 fecha_emision = DateTime.UtcNow,
@@ -36,7 +35,7 @@ namespace MicroServicio.RedCar.Business.Mappers
                 id_factura = request.id_factura,
                 numero_factura = request.numero_factura,
 
-                id_cliente = request.id_cliente,
+                // id_cliente y montos eliminados: se asignan desde la reserva en FacturaService
                 id_reserva = request.id_reserva,
 
                 observaciones_factura = request.observaciones_factura,

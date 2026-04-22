@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace MicroServicio.RedCar.Business.DTOs.Factura
+﻿namespace MicroServicio.RedCar.Business.DTOs.Factura
 {
     public class ActualizarFacturaRequest
     {
@@ -8,7 +6,7 @@ namespace MicroServicio.RedCar.Business.DTOs.Factura
 
         public string numero_factura { get; set; } = null!;
 
-        public int id_cliente { get; set; }
+        // id_cliente eliminado: se deriva automáticamente de la reserva en FacturaService
         public int id_reserva { get; set; }
 
         public string? observaciones_factura { get; set; }

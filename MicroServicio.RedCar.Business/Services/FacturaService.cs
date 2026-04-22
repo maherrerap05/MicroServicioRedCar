@@ -11,10 +11,12 @@ namespace MicroServicio.RedCar.Business.Services
     public class FacturaService : IFacturaService
     {
         private readonly IFacturaDataService _facturaDataService;
+        private readonly IReservaDataService _reservaDataService;
 
-        public FacturaService(IFacturaDataService facturaDataService)
+        public FacturaService(IFacturaDataService facturaDataService, IReservaDataService reservaDataService)
         {
             _facturaDataService = facturaDataService;
+            _reservaDataService = reservaDataService;
         }
 
         // =========================
@@ -26,7 +28,30 @@ namespace MicroServicio.RedCar.Business.Services
             if (errors.Any())
                 throw new ValidationException("La solicitud de creación de factura es inválida.", errors);
 
+            // 1. Verificar que la reserva existe
+            var reserva = await _reservaDataService.ObtenerPorIdAsync(request.id_reserva, cancellationToken);
+            if (reserva is null)
+                throw new NotFoundException("No se encontró la reserva indicada.");
+
+            // 2. Solo se puede facturar reservas confirmadas
+            if (reserva.estado_reserva != "CON")
+                throw new BusinessException(
+                    reserva.estado_reserva == "CAN"
+                        ? "No se puede generar una factura para una reserva cancelada."
+                        : "Solo se pueden facturar reservas confirmadas.");
+
+            // 3. Verificar que la reserva no tenga ya una factura
+            var facturaExistente = await _facturaDataService.ObtenerFacturaPorReservaAsync(request.id_reserva, cancellationToken);
+            if (facturaExistente is not null)
+                throw new BusinessException("Ya existe una factura asociada a esta reserva.");
+
+            // 4. Mapear y poblar campos derivados de la reserva
             var model = FacturaBusinessMapper.ToDataModel(request);
+
+            model.id_cliente = reserva.id_cliente;
+            model.subtotal = reserva.subtotal_reserva;
+            model.valor_iva = reserva.valor_iva;
+            model.total = reserva.total_reserva;
 
             var creado = await _facturaDataService.CrearAsync(model, cancellationToken);
 
@@ -42,14 +67,40 @@ namespace MicroServicio.RedCar.Business.Services
             if (errors.Any())
                 throw new ValidationException("La solicitud de actualización de factura es inválida.", errors);
 
+            // 1. Verificar que la factura existe
             var existente = await _facturaDataService.ObtenerPorIdAsync(request.id_factura, cancellationToken);
-
             if (existente is null)
                 throw new NotFoundException("No se encontró la factura.");
 
+            // 2. Verificar que la nueva reserva existe
+            var reserva = await _reservaDataService.ObtenerPorIdAsync(request.id_reserva, cancellationToken);
+            if (reserva is null)
+                throw new NotFoundException("No se encontró la reserva indicada.");
+
+            // 3. Verificar que la reserva está confirmada
+            if (reserva.estado_reserva != "CON")
+                throw new BusinessException(
+                    reserva.estado_reserva == "CAN"
+                        ? "No se puede asociar una factura a una reserva cancelada."
+                        : "Solo se pueden asociar facturas a reservas confirmadas.");
+
+            // 4. Si cambió la reserva, verificar que la nueva no tenga ya otra factura
+            if (request.id_reserva != existente.id_reserva)
+            {
+                var facturaEnNuevaReserva = await _facturaDataService.ObtenerFacturaPorReservaAsync(request.id_reserva, cancellationToken);
+                if (facturaEnNuevaReserva is not null)
+                    throw new BusinessException("Ya existe una factura asociada a la reserva indicada.");
+            }
+
+            // 5. Mapear y poblar campos derivados de la reserva
             var model = FacturaBusinessMapper.ToDataModel(request);
 
-            // PRESERVAR AUDITORÍA
+            model.id_cliente = reserva.id_cliente;
+            model.subtotal = reserva.subtotal_reserva;
+            model.valor_iva = reserva.valor_iva;
+            model.total = reserva.total_reserva;
+
+            // 6. Preservar auditoría de creación
             model.guid_factura = existente.guid_factura;
             model.fecha_registro_utc = existente.fecha_registro_utc;
             model.creado_por_usuario = existente.creado_por_usuario;
@@ -165,6 +216,7 @@ namespace MicroServicio.RedCar.Business.Services
             if (errors.Any())
                 throw new ValidationException("Solicitud de aprobación inválida.", errors);
 
+            // 1. Recuperar la factura existente
             var existente = await _facturaDataService.ObtenerPorIdAsync(request.id_factura, cancellationToken);
 
             if (existente is null)
@@ -173,9 +225,17 @@ namespace MicroServicio.RedCar.Business.Services
             if (existente.estado == "APR")
                 throw new BusinessException("La factura ya está aprobada.");
 
-            var model = FacturaBusinessMapper.ToDataModel(request);
+            if (existente.estado == "INA")
+                throw new BusinessException("Una factura anulada no puede aprobarse.");
 
-            var actualizado = await _facturaDataService.ActualizarAsync(model, cancellationToken);
+            // 2. Mutar solo los campos propios de la aprobación sobre el model existente
+            existente.estado = "APR";
+            existente.modificado_por_usuario = request.modificado_por_usuario;
+            existente.fecha_modificacion_utc = DateTime.UtcNow;
+            existente.modificacion_ip = request.modificacion_ip;
+            existente.servicio_origen = request.servicio_origen;
+
+            var actualizado = await _facturaDataService.ActualizarAsync(existente, cancellationToken);
 
             return FacturaBusinessMapper.ToResponse(actualizado!);
         }
@@ -189,14 +249,29 @@ namespace MicroServicio.RedCar.Business.Services
             if (errors.Any())
                 throw new ValidationException("Solicitud de anulación inválida.", errors);
 
+            // 1. Recuperar la factura existente
             var existente = await _facturaDataService.ObtenerPorIdAsync(request.id_factura, cancellationToken);
 
             if (existente is null)
                 throw new NotFoundException("Factura no encontrada.");
 
-            var model = FacturaBusinessMapper.ToDataModel(request);
+            if (existente.estado == "INA")
+                throw new BusinessException("La factura ya está anulada.");
 
-            var actualizado = await _facturaDataService.ActualizarAsync(model, cancellationToken);
+            if (existente.estado == "APR")
+                throw new BusinessException("Una factura aprobada no puede anularse.");
+
+            // 2. Mutar solo los campos propios de la anulación sobre el model existente
+            existente.estado = "INA";
+            existente.es_eliminado = true;              // ← línea que faltaba
+            existente.motivo_inhabilitacion = request.motivo_inhabilitacion;
+            existente.fecha_inhabilitacion_utc = DateTime.UtcNow;
+            existente.modificado_por_usuario = request.modificado_por_usuario;
+            existente.fecha_modificacion_utc = DateTime.UtcNow;
+            existente.modificacion_ip = request.modificacion_ip;
+            existente.servicio_origen = request.servicio_origen;
+
+            var actualizado = await _facturaDataService.ActualizarAsync(existente, cancellationToken);
 
             return FacturaBusinessMapper.ToResponse(actualizado!);
         }
