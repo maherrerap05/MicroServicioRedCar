@@ -86,7 +86,7 @@ public class ClientesController : ControllerBase
             "api_user";
 
         request.modificacion_ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-        request.servicio_origen = "MicroServicio.RedCar.Api";
+        request.servicio_origen = "API";
 
         var result = await _clienteService.CrearAsync(request, cancellationToken);
 
@@ -107,7 +107,7 @@ public class ClientesController : ControllerBase
             "api_user";
 
         request.modificacion_ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-        request.servicio_origen = "MicroServicio.RedCar.Api";
+        request.servicio_origen = "API";
 
         var result = await _clienteService.ActualizarAsync(request, cancellationToken);
 

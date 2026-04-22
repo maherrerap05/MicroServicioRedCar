@@ -98,7 +98,7 @@ public class CategoriaVehiculosController : ControllerBase
             "api_user";
 
         request.modificado_desde_ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-        request.origen_registro = "MicroServicio.RedCar.Api";
+        request.origen_registro = "API";
 
         var result = await _categoriaVehiculoService.CrearAsync(request);
 
@@ -118,7 +118,7 @@ public class CategoriaVehiculosController : ControllerBase
             "api_user";
 
         request.modificado_desde_ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-        request.origen_registro = "MicroServicio.RedCar.Api";
+        request.origen_registro = "API";
 
         var result = await _categoriaVehiculoService.ActualizarAsync(request);
 

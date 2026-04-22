@@ -42,33 +42,33 @@ namespace MicroServicio.RedCar.Business.Mappers
         {
             return new ConductorDataModel
             {
-                id_conductor = request.id_conductor,
+                id_conductor = request.id_conductor!.Value,
 
-                codigo_conductor = request.codigo_conductor,
+                codigo_conductor = request.codigo_conductor!,
 
-                tipo_identificacion = request.tipo_identificacion,
-                numero_identificacion = request.numero_identificacion,
+                tipo_identificacion = request.tipo_identificacion!,
+                numero_identificacion = request.numero_identificacion!,
 
-                con_nombre1 = request.con_nombre1,
+                con_nombre1 = request.con_nombre1!,
                 con_nombre2 = request.con_nombre2,
 
-                con_apellido1 = request.con_apellido1,
+                con_apellido1 = request.con_apellido1!,
                 con_apellido2 = request.con_apellido2,
 
-                numero_licencia = request.numero_licencia,
-                fecha_vencimiento_licencia = request.fecha_vencimiento_licencia,
+                numero_licencia = request.numero_licencia!,
+                fecha_vencimiento_licencia = request.fecha_vencimiento_licencia!.Value,
 
-                edad_conductor = request.edad_conductor,
+                edad_conductor = request.edad_conductor!.Value,
 
-                con_telefono = request.con_telefono,
-                con_correo = request.con_correo,
+                con_telefono = request.con_telefono!,
+                con_correo = request.con_correo!,
 
-                estado_conductor = request.estado_conductor,
+                estado_conductor = request.estado_conductor!,
 
                 modificado_por_usuario = request.modificado_por_usuario,
                 fecha_modificacion_utc = DateTime.UtcNow,
                 modificado_desde_ip = request.modificado_desde_ip,
-                origen_registro = request.origen_registro,
+                origen_registro = request.origen_registro!,
 
                 motivo_inhabilitacion = request.motivo_inhabilitacion,
                 fecha_inhabilitacion_utc = request.estado_conductor == "INA" ? DateTime.UtcNow : null

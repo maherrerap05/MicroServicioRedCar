@@ -25,7 +25,6 @@ namespace MicroServicio.RedCar.Business.Services
             if (errors.Any())
                 throw new ValidationException("La solicitud de creación de conductor es inválida.", errors);
 
-            // VALIDACIONES DE NEGOCIO (UNIQUE)
             if (await _conductorDataService.ExistePorCodigoAsync(request.codigo_conductor, cancellationToken))
                 throw new ValidationException("Ya existe un conductor con ese código.");
 
@@ -36,7 +35,6 @@ namespace MicroServicio.RedCar.Business.Services
                 throw new ValidationException("Ya existe un conductor con esa licencia.");
 
             var model = ConductorBusinessMapper.ToDataModel(request);
-
             var creado = await _conductorDataService.CrearAsync(model, cancellationToken);
 
             return ConductorBusinessMapper.ToResponse(creado);
@@ -51,27 +49,25 @@ namespace MicroServicio.RedCar.Business.Services
             if (errors.Any())
                 throw new ValidationException("La solicitud de actualización de conductor es inválida.", errors);
 
-            var existente = await _conductorDataService.ObtenerPorIdAsync(request.id_conductor, cancellationToken);
+            var existente = await _conductorDataService.ObtenerPorIdAsync(request.id_conductor!.Value, cancellationToken);
 
             if (existente is null)
                 throw new NotFoundException("No se encontró el conductor.");
 
-            // VALIDAR DUPLICADOS
-            var porCodigo = await _conductorDataService.ObtenerPorCodigoAsync(request.codigo_conductor, cancellationToken);
-            if (porCodigo != null && porCodigo.id_conductor != request.id_conductor)
+            var porCodigo = await _conductorDataService.ObtenerPorCodigoAsync(request.codigo_conductor!, cancellationToken);
+            if (porCodigo != null && porCodigo.id_conductor != request.id_conductor!.Value)
                 throw new ValidationException("Ya existe otro conductor con ese código.");
 
-            var porIdentificacion = await _conductorDataService.ObtenerPorIdentificacionAsync(request.numero_identificacion, cancellationToken);
-            if (porIdentificacion != null && porIdentificacion.id_conductor != request.id_conductor)
+            var porIdentificacion = await _conductorDataService.ObtenerPorIdentificacionAsync(request.numero_identificacion!, cancellationToken);
+            if (porIdentificacion != null && porIdentificacion.id_conductor != request.id_conductor!.Value)
                 throw new ValidationException("Ya existe otro conductor con esa identificación.");
 
-            var porLicencia = await _conductorDataService.ObtenerPorLicenciaAsync(request.numero_licencia, cancellationToken);
-            if (porLicencia != null && porLicencia.id_conductor != request.id_conductor)
+            var porLicencia = await _conductorDataService.ObtenerPorLicenciaAsync(request.numero_licencia!, cancellationToken);
+            if (porLicencia != null && porLicencia.id_conductor != request.id_conductor!.Value)
                 throw new ValidationException("Ya existe otro conductor con esa licencia.");
 
             var model = ConductorBusinessMapper.ToDataModel(request);
 
-            // PRESERVAR AUDITORÍA
             model.conductor_guid = existente.conductor_guid;
             model.fecha_registro_utc = existente.fecha_registro_utc;
             model.creado_por_usuario = existente.creado_por_usuario;

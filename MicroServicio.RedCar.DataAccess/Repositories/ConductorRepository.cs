@@ -30,7 +30,7 @@ namespace MicroServicio.RedCar.DataAccess.Repositories
         {
             return await _context.Conductores
                 .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.id_conductor == id_conductor && !c.es_eliminado, cancellationToken);
+                .FirstOrDefaultAsync(c => c.id_conductor == id_conductor, cancellationToken);
         }
 
         public async Task<ConductorEntity?> ObtenerParaActualizarAsync(int id_conductor, CancellationToken cancellationToken = default)
@@ -43,28 +43,28 @@ namespace MicroServicio.RedCar.DataAccess.Repositories
         {
             return await _context.Conductores
                 .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.conductor_guid == conductor_guid && !c.es_eliminado, cancellationToken);
+                .FirstOrDefaultAsync(c => c.conductor_guid == conductor_guid, cancellationToken);
         }
 
         public async Task<ConductorEntity?> ObtenerPorCodigoAsync(string codigo_conductor, CancellationToken cancellationToken = default)
         {
             return await _context.Conductores
                 .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.codigo_conductor == codigo_conductor && !c.es_eliminado, cancellationToken);
+                .FirstOrDefaultAsync(c => c.codigo_conductor == codigo_conductor, cancellationToken);
         }
 
         public async Task<ConductorEntity?> ObtenerPorIdentificacionAsync(string numero_identificacion, CancellationToken cancellationToken = default)
         {
             return await _context.Conductores
                 .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.numero_identificacion == numero_identificacion && !c.es_eliminado, cancellationToken);
+                .FirstOrDefaultAsync(c => c.numero_identificacion == numero_identificacion, cancellationToken);
         }
 
         public async Task<ConductorEntity?> ObtenerPorLicenciaAsync(string numero_licencia, CancellationToken cancellationToken = default)
         {
             return await _context.Conductores
                 .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.numero_licencia == numero_licencia && !c.es_eliminado, cancellationToken);
+                .FirstOrDefaultAsync(c => c.numero_licencia == numero_licencia, cancellationToken);
         }
 
         // =========================
