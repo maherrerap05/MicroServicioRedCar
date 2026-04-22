@@ -30,7 +30,7 @@ namespace MicroServicio.RedCar.DataAccess.Repositories
         {
             return await _context.Vehiculos
                 .AsNoTracking()
-                .FirstOrDefaultAsync(v => v.id_vehiculo == id_vehiculo && !v.es_eliminado, cancellationToken);
+                .FirstOrDefaultAsync(v => v.id_vehiculo == id_vehiculo, cancellationToken);
         }
 
         public async Task<VehiculoEntity?> ObtenerParaActualizarAsync(int id_vehiculo, CancellationToken cancellationToken = default)
@@ -43,21 +43,21 @@ namespace MicroServicio.RedCar.DataAccess.Repositories
         {
             return await _context.Vehiculos
                 .AsNoTracking()
-                .FirstOrDefaultAsync(v => v.vehiculo_guid == vehiculo_guid && !v.es_eliminado, cancellationToken);
+                .FirstOrDefaultAsync(v => v.vehiculo_guid == vehiculo_guid, cancellationToken);
         }
 
         public async Task<VehiculoEntity?> ObtenerPorCodigoAsync(string codigo_interno_vehiculo, CancellationToken cancellationToken = default)
         {
             return await _context.Vehiculos
                 .AsNoTracking()
-                .FirstOrDefaultAsync(v => v.codigo_interno_vehiculo == codigo_interno_vehiculo && !v.es_eliminado, cancellationToken);
+                .FirstOrDefaultAsync(v => v.codigo_interno_vehiculo == codigo_interno_vehiculo, cancellationToken);
         }
 
         public async Task<VehiculoEntity?> ObtenerPorPlacaAsync(string placa_vehiculo, CancellationToken cancellationToken = default)
         {
             return await _context.Vehiculos
                 .AsNoTracking()
-                .FirstOrDefaultAsync(v => v.placa_vehiculo == placa_vehiculo && !v.es_eliminado, cancellationToken);
+                .FirstOrDefaultAsync(v => v.placa_vehiculo == placa_vehiculo, cancellationToken);
         }
 
         // =========================

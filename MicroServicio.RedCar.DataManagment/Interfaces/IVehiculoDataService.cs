@@ -59,5 +59,7 @@ namespace MicroServicio.RedCar.DataManagement.Interfaces
         Task<bool> ExistePorCodigoAsync(string codigo_interno_vehiculo, CancellationToken cancellationToken = default);
 
         Task<bool> ExistePorPlacaAsync(string placa_vehiculo, CancellationToken cancellationToken = default);
+
+        Task<bool> TieneReservasActivasAsync(int id_vehiculo, CancellationToken cancellationToken = default);
     }
 }

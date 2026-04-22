@@ -75,5 +75,14 @@ namespace MicroServicio.RedCar.DataAccess.Repositories
                 .AsNoTracking()
                 .AnyAsync(r => r.codigo_reserva == codigo_reserva && !r.es_eliminado, cancellationToken);
         }
+
+        public async Task<bool> ExisteReservaActivaPorVehiculoAsync(int id_vehiculo, CancellationToken cancellationToken = default)
+        {
+            return await _context.Reservas
+                .AnyAsync(r => r.id_vehiculo == id_vehiculo
+                            && r.estado_reserva == "PEN"
+                            && !r.es_eliminado,
+                          cancellationToken);
+        }
     }
 }

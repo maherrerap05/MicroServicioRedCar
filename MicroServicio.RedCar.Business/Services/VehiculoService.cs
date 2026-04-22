@@ -11,10 +11,14 @@ namespace MicroServicio.RedCar.Business.Services
     public class VehiculoService : IVehiculoService
     {
         private readonly IVehiculoDataService _vehiculoDataService;
+        private readonly ILocalizacionDataService _localizacionDataService;
 
-        public VehiculoService(IVehiculoDataService vehiculoDataService)
+        public VehiculoService(
+            IVehiculoDataService vehiculoDataService,
+            ILocalizacionDataService localizacionDataService)
         {
             _vehiculoDataService = vehiculoDataService;
+            _localizacionDataService = localizacionDataService;
         }
 
         // =========================
@@ -58,43 +62,106 @@ namespace MicroServicio.RedCar.Business.Services
             if (existente is null)
                 throw new NotFoundException("No se encontró el vehículo solicitado.");
 
-            var porCodigo = await _vehiculoDataService
-                .ObtenerPorCodigoAsync(request.codigo_interno_vehiculo, cancellationToken);
+            if (request.codigo_interno_vehiculo != null)
+            {
+                var porCodigo = await _vehiculoDataService
+                    .ObtenerPorCodigoAsync(request.codigo_interno_vehiculo, cancellationToken);
 
-            if (porCodigo is not null && porCodigo.id_vehiculo != request.id_vehiculo)
-                throw new ValidationException("Ya existe otro vehículo con el código interno indicado.");
+                if (porCodigo is not null && porCodigo.id_vehiculo != request.id_vehiculo)
+                    throw new ValidationException("Ya existe otro vehículo con el código interno indicado.");
+            }
 
-            var porPlaca = await _vehiculoDataService
-                .ObtenerPorPlacaAsync(request.placa_vehiculo, cancellationToken);
+            if (request.placa_vehiculo != null)
+            {
+                var porPlaca = await _vehiculoDataService
+                    .ObtenerPorPlacaAsync(request.placa_vehiculo, cancellationToken);
 
-            if (porPlaca is not null && porPlaca.id_vehiculo != request.id_vehiculo)
-                throw new ValidationException("Ya existe otro vehículo con la placa indicada.");
-
-            var dataModel = VehiculoBusinessMapper.ToDataModel(request);
+                if (porPlaca is not null && porPlaca.id_vehiculo != request.id_vehiculo)
+                    throw new ValidationException("Ya existe otro vehículo con la placa indicada.");
+            }
 
             // =========================
-            // PRESERVAR DATOS ORIGINALES
+            // MAPEO PARCIAL
             // =========================
-            dataModel.vehiculo_guid = existente.vehiculo_guid;
-            dataModel.fecha_registro_utc = existente.fecha_registro_utc;
-            dataModel.creado_por_usuario = existente.creado_por_usuario;
-            dataModel.row_version = existente.row_version;
-            dataModel.es_eliminado = existente.es_eliminado;
+            existente.fecha_modificacion_utc = DateTime.UtcNow;
+            existente.modificado_por_usuario = request.modificado_por_usuario ?? existente.modificado_por_usuario;
+            existente.modificado_desde_ip = request.modificado_desde_ip ?? existente.modificado_desde_ip;
+            existente.origen_registro = request.origen_registro ?? existente.origen_registro;
+
+            if (request.codigo_interno_vehiculo != null)
+                existente.codigo_interno_vehiculo = request.codigo_interno_vehiculo.Trim();
+
+            if (request.placa_vehiculo != null)
+                existente.placa_vehiculo = request.placa_vehiculo.Trim();
+
+            if (request.modelo_vehiculo != null)
+                existente.modelo_vehiculo = request.modelo_vehiculo.Trim();
+
+            if (request.anio_fabricacion.HasValue)
+                existente.anio_fabricacion = request.anio_fabricacion.Value;
+
+            if (request.color_vehiculo != null)
+                existente.color_vehiculo = request.color_vehiculo.Trim();
+
+            if (request.tipo_combustible != null)
+                existente.tipo_combustible = request.tipo_combustible.Trim();
+
+            if (request.tipo_transmision != null)
+                existente.tipo_transmision = request.tipo_transmision.Trim();
+
+            if (request.capacidad_pasajeros.HasValue)
+                existente.capacidad_pasajeros = request.capacidad_pasajeros.Value;
+
+            if (request.capacidad_maletas.HasValue)
+                existente.capacidad_maletas = request.capacidad_maletas.Value;
+
+            if (request.numero_puertas.HasValue)
+                existente.numero_puertas = request.numero_puertas.Value;
+
+            if (request.localizacion_actual.HasValue)
+                existente.localizacion_actual = request.localizacion_actual.Value;
+
+            if (request.precio_base_dia.HasValue)
+                existente.precio_base_dia = request.precio_base_dia.Value;
+
+            if (request.kilometraje_actual.HasValue)
+                existente.kilometraje_actual = request.kilometraje_actual.Value;
+
+            if (request.observaciones_generales != null)
+                existente.observaciones_generales = request.observaciones_generales.Trim();
+
+            if (request.imagen_referencial_url != null)
+                existente.imagen_referencial_url = request.imagen_referencial_url.Trim();
+
+            if (request.id_marca_vehiculo.HasValue)
+                existente.id_marca_vehiculo = request.id_marca_vehiculo.Value;
+
+            if (request.id_categoria_vehiculo.HasValue)
+                existente.id_categoria_vehiculo = request.id_categoria_vehiculo.Value;
+
+            if (request.aire_acondicionado.HasValue)
+                existente.aire_acondicionado = request.aire_acondicionado.Value;
 
             // =========================
             // CONTROL DE INHABILITACIÓN
             // =========================
-            if (request.estado_vehiculo == "ACT")
+            if (request.estado_vehiculo != null)
             {
-                dataModel.fecha_inhabilitacion_utc = null;
-                dataModel.motivo_inhabilitacion = null;
-            }
-            else if (request.estado_vehiculo == "INA" && existente.estado_vehiculo == "INA")
-            {
-                dataModel.fecha_inhabilitacion_utc = existente.fecha_inhabilitacion_utc ?? dataModel.fecha_inhabilitacion_utc;
+                existente.estado_vehiculo = request.estado_vehiculo;
+
+                if (request.estado_vehiculo == "ACT")
+                {
+                    existente.fecha_inhabilitacion_utc = null;
+                    existente.motivo_inhabilitacion = null;
+                }
+                else if (request.estado_vehiculo == "INA")
+                {
+                    existente.motivo_inhabilitacion = request.motivo_inhabilitacion!.Trim();
+                    existente.fecha_inhabilitacion_utc = existente.fecha_inhabilitacion_utc ?? DateTime.UtcNow;
+                }
             }
 
-            var actualizado = await _vehiculoDataService.ActualizarAsync(dataModel, cancellationToken);
+            var actualizado = await _vehiculoDataService.ActualizarAsync(existente, cancellationToken);
 
             if (actualizado is null)
                 throw new NotFoundException("No se pudo actualizar el vehículo porque no existe.");
@@ -109,6 +176,16 @@ namespace MicroServicio.RedCar.Business.Services
 
             if (string.IsNullOrWhiteSpace(usuario))
                 throw new ValidationException("El usuario es obligatorio para la eliminación lógica.");
+
+            var vehiculo = await _vehiculoDataService.ObtenerPorIdAsync(id_vehiculo, cancellationToken);
+
+            if (vehiculo is null)
+                throw new NotFoundException("No se encontró el vehículo solicitado.");
+
+            var tieneReservas = await _vehiculoDataService.TieneReservasActivasAsync(id_vehiculo, cancellationToken);
+
+            if (tieneReservas)
+                throw new BusinessException("No se puede eliminar un vehículo que tiene reservas activas asociadas.");
 
             var eliminado = await _vehiculoDataService.EliminarLogicoAsync(id_vehiculo, usuario, motivo, cancellationToken);
 
@@ -232,6 +309,12 @@ namespace MicroServicio.RedCar.Business.Services
             if (fecha_hora_recogida >= fecha_hora_devolucion)
                 throw new ValidationException("La fecha/hora de devolución debe ser mayor a la fecha/hora de recogida.");
 
+            var localizacion = await _localizacionDataService
+                .ObtenerPorIdAsync(id_localizacion_recogida, cancellationToken);
+
+            if (localizacion is null)
+                throw new NotFoundException("La localización de recogida especificada no existe.");
+
             var vehiculos = await _vehiculoDataService.ObtenerDisponiblesAsync(
                 id_localizacion_recogida,
                 fecha_hora_recogida,
@@ -258,6 +341,12 @@ namespace MicroServicio.RedCar.Business.Services
 
             if (fecha_hora_recogida >= fecha_hora_devolucion)
                 throw new ValidationException("La fecha/hora de devolución debe ser mayor a la fecha/hora de recogida.");
+
+            var localizacion = await _localizacionDataService
+                .ObtenerPorIdAsync(id_localizacion_recogida, cancellationToken);
+
+            if (localizacion is null)
+                throw new NotFoundException("La localización de recogida especificada no existe.");
 
             var vehiculos = await _vehiculoDataService.ObtenerDisponiblesPorCategoriaAsync(
                 id_localizacion_recogida,

@@ -45,50 +45,6 @@ namespace MicroServicio.RedCar.Business.Mappers
             };
         }
 
-        public static VehiculoDataModel ToDataModel(ActualizarVehiculoRequest request)
-        {
-            return new VehiculoDataModel
-            {
-                id_vehiculo = request.id_vehiculo,
-
-                codigo_interno_vehiculo = request.codigo_interno_vehiculo,
-                placa_vehiculo = request.placa_vehiculo,
-                modelo_vehiculo = request.modelo_vehiculo,
-                anio_fabricacion = request.anio_fabricacion,
-
-                color_vehiculo = request.color_vehiculo,
-                tipo_combustible = request.tipo_combustible,
-                tipo_transmision = request.tipo_transmision,
-
-                capacidad_pasajeros = request.capacidad_pasajeros,
-                capacidad_maletas = request.capacidad_maletas,
-                numero_puertas = request.numero_puertas,
-
-                localizacion_actual = request.localizacion_actual,
-
-                precio_base_dia = request.precio_base_dia,
-                kilometraje_actual = request.kilometraje_actual,
-
-                observaciones_generales = request.observaciones_generales,
-                imagen_referencial_url = request.imagen_referencial_url,
-
-                estado_vehiculo = request.estado_vehiculo,
-
-                id_marca_vehiculo = request.id_marca_vehiculo,
-                id_categoria_vehiculo = request.id_categoria_vehiculo,
-
-                aire_acondicionado = request.aire_acondicionado,
-
-                modificado_por_usuario = request.modificado_por_usuario,
-                fecha_modificacion_utc = DateTime.UtcNow,
-                modificado_desde_ip = request.modificado_desde_ip,
-                origen_registro = request.origen_registro,
-
-                motivo_inhabilitacion = request.motivo_inhabilitacion,
-                fecha_inhabilitacion_utc = request.estado_vehiculo == "INA" ? DateTime.UtcNow : null
-            };
-        }
-
         public static VehiculoResponse ToResponse(VehiculoDataModel model)
         {
             return new VehiculoResponse

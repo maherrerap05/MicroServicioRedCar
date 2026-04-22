@@ -17,6 +17,8 @@ namespace MicroServicio.RedCar.DataAccess.Repositories.Interfaces
 
         Task<ReservaEntity?> ObtenerPorCodigoAsync(string codigo_reserva, CancellationToken cancellationToken = default);
 
+        Task<bool> ExisteReservaActivaPorVehiculoAsync(int id_vehiculo, CancellationToken cancellationToken = default);
+
         // =========================
         // COMANDOS
         // =========================

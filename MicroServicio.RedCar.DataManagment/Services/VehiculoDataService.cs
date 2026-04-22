@@ -238,6 +238,9 @@ namespace MicroServicio.RedCar.DataManagement.Services
         // =========================
         // VALIDACIONES
         // =========================
+        // =========================
+        // VALIDACIONES
+        // =========================
         public async Task<bool> ExistePorCodigoAsync(string codigo_interno_vehiculo, CancellationToken cancellationToken = default)
         {
             return await _unitOfWork.VehiculoRepository.ExistePorCodigoAsync(codigo_interno_vehiculo, cancellationToken);
@@ -246,6 +249,11 @@ namespace MicroServicio.RedCar.DataManagement.Services
         public async Task<bool> ExistePorPlacaAsync(string placa_vehiculo, CancellationToken cancellationToken = default)
         {
             return await _unitOfWork.VehiculoRepository.ExistePorPlacaAsync(placa_vehiculo, cancellationToken);
+        }
+
+        public async Task<bool> TieneReservasActivasAsync(int id_vehiculo, CancellationToken cancellationToken = default)
+        {
+            return await _unitOfWork.ReservaRepository.ExisteReservaActivaPorVehiculoAsync(id_vehiculo, cancellationToken);
         }
     }
 }

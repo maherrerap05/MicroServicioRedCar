@@ -127,7 +127,7 @@ public class VehiculosController : ControllerBase
             "api_user";
 
         request.modificado_desde_ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-        request.origen_registro = "MicroServicio.RedCar.Api";
+        request.origen_registro = "API";
 
         var result = await _vehiculoService.CrearAsync(request, cancellationToken);
 
@@ -137,6 +137,14 @@ public class VehiculosController : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Actualizar(int id, [FromBody] ActualizarVehiculoRequest request, CancellationToken cancellationToken)
     {
+        // Validar mismatch ANTES de pisar el id con el del path
+        if (request.id_vehiculo != 0 && request.id_vehiculo != id)
+            return BadRequest(new ApiResponse<string>
+            {
+                Success = false,
+                Message = "El ID del vehículo en el body no coincide con el ID del path."
+            });
+
         request.id_vehiculo = id;
 
         request.modificado_por_usuario =
@@ -145,7 +153,7 @@ public class VehiculosController : ControllerBase
             "api_user";
 
         request.modificado_desde_ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-        request.origen_registro = "MicroServicio.RedCar.Api";
+        request.origen_registro = "API";
 
         var result = await _vehiculoService.ActualizarAsync(request, cancellationToken);
 
