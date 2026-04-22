@@ -30,7 +30,7 @@ namespace MicroServicio.RedCar.DataAccess.Repositories
         {
             return await _context.Clientes
                 .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.id_cliente == id_cliente && !c.es_eliminado, cancellationToken);
+                .FirstOrDefaultAsync(c => c.id_cliente == id_cliente, cancellationToken);
         }
 
         public async Task<ClienteEntity?> ObtenerParaActualizarAsync(int id_cliente, CancellationToken cancellationToken = default)
@@ -43,21 +43,21 @@ namespace MicroServicio.RedCar.DataAccess.Repositories
         {
             return await _context.Clientes
                 .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.cliente_guid == cliente_guid && !c.es_eliminado, cancellationToken);
+                .FirstOrDefaultAsync(c => c.cliente_guid == cliente_guid, cancellationToken);
         }
 
         public async Task<ClienteEntity?> ObtenerPorIdentificacionAsync(string numero_identificacion, CancellationToken cancellationToken = default)
         {
             return await _context.Clientes
                 .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.numero_identificacion == numero_identificacion && !c.es_eliminado, cancellationToken);
+                .FirstOrDefaultAsync(c => c.numero_identificacion == numero_identificacion, cancellationToken);
         }
 
         public async Task<ClienteEntity?> ObtenerPorCorreoAsync(string correo, CancellationToken cancellationToken = default)
         {
             return await _context.Clientes
                 .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.correo == correo && !c.es_eliminado, cancellationToken);
+                .FirstOrDefaultAsync(c => c.correo == correo, cancellationToken);
         }
 
         // =========================
@@ -80,14 +80,14 @@ namespace MicroServicio.RedCar.DataAccess.Repositories
         {
             return await _context.Clientes
                 .AsNoTracking()
-                .AnyAsync(c => c.numero_identificacion == numero_identificacion && !c.es_eliminado, cancellationToken);
+                .AnyAsync(c => c.numero_identificacion == numero_identificacion, cancellationToken);
         }
 
         public async Task<bool> ExistePorCorreoAsync(string correo, CancellationToken cancellationToken = default)
         {
             return await _context.Clientes
                 .AsNoTracking()
-                .AnyAsync(c => c.correo == correo && !c.es_eliminado, cancellationToken);
+                .AnyAsync(c => c.correo == correo, cancellationToken);
         }
     }
 }

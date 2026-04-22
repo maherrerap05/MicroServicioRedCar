@@ -116,7 +116,7 @@ public class FacturasController : ControllerBase
             "api_user";
 
         request.modificacion_ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-        request.servicio_origen = "MicroServicio.RedCar.Api";
+        request.servicio_origen = "API";
 
         var result = await _facturaService.CrearAsync(request, cancellationToken);
 
@@ -135,7 +135,7 @@ public class FacturasController : ControllerBase
             User.FindFirst("unique_name")?.Value ??
             "api_user";
         request.modificacion_ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-        request.servicio_origen = "MicroServicio.RedCar.Api";
+        request.servicio_origen = "API";
 
         var result = await _facturaService.ActualizarAsync(request, cancellationToken);
 
@@ -156,7 +156,7 @@ public class FacturasController : ControllerBase
                 User.FindFirst("unique_name")?.Value ??
                 "api_user",
             modificacion_ip = HttpContext.Connection.RemoteIpAddress?.ToString(),
-            servicio_origen = "MicroServicio.RedCar.Api"
+            servicio_origen = "API"
         };
 
         var result = await _facturaService.AprobarAsync(request, cancellationToken);
@@ -179,7 +179,7 @@ public class FacturasController : ControllerBase
             User.FindFirst("unique_name")?.Value ??
             "api_user";
         request.modificacion_ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-        request.servicio_origen = "MicroServicio.RedCar.Api";
+        request.servicio_origen = "API";
 
         var result = await _facturaService.AnularAsync(request, cancellationToken);
 
