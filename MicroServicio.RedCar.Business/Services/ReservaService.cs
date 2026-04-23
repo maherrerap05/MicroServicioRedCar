@@ -134,15 +134,26 @@ namespace MicroServicio.RedCar.Business.Services
                 throw new NotFoundException($"No se encontró el vehículo con id {request.id_vehiculo}.");
 
             // ── Conductores ──────────────────────────────────────────────────
-            var conductores = request.conductores
-                .Select(x => ReservaBusinessMapper.ToDataModel(x, request.id_reserva))
-                .ToList();
+            // 🔒 Se propaga modificado_por_usuario del padre si el hijo no lo trae
+            var conductores = new List<ReservaConductorDataModel>();
+
+            foreach (var conductorRequest in request.conductores)
+            {
+                if (string.IsNullOrWhiteSpace(conductorRequest.modificado_por_usuario))
+                    conductorRequest.modificado_por_usuario = request.modificado_por_usuario;
+
+                conductores.Add(ReservaBusinessMapper.ToDataModel(conductorRequest, request.id_reserva));
+            }
 
             // ── Extras: consulta precio real de cada extra ───────────────────
+            // 🔒 Se propaga modificado_por_usuario del padre si el hijo no lo trae
             var extras = new List<ReservaExtraDataModel>();
 
             foreach (var extraRequest in request.extras)
             {
+                if (string.IsNullOrWhiteSpace(extraRequest.modificado_por_usuario))
+                    extraRequest.modificado_por_usuario = request.modificado_por_usuario;
+
                 var extraData = await _extraDataService.ObtenerPorIdAsync(
                     extraRequest.id_extra,
                     cancellationToken);
@@ -162,7 +173,11 @@ namespace MicroServicio.RedCar.Business.Services
             var fechaFin = request.fecha_devolucion.Date + request.hora_devolucion;
             var cantidadDias = (int)Math.Ceiling((fechaFin - fechaInicio).TotalDays);
             var subtotalVehiculo = vehiculo.precio_base_dia * cantidadDias;
-            var subtotalExtras = extras.Sum(x => x.subtotal_extra);
+
+            var subtotalExtras = extras
+                .Where(x => x.estado_reserva_extra == "ACT")
+                .Sum(x => x.subtotal_extra);
+
             var subtotalReserva = subtotalVehiculo + subtotalExtras;
             var valorIva = Math.Round(subtotalReserva * TasaIva, 2);
             var totalReserva = subtotalReserva + valorIva;
@@ -172,7 +187,7 @@ namespace MicroServicio.RedCar.Business.Services
             dataModel.valor_iva = valorIva;
             dataModel.total_reserva = totalReserva;
 
-            // 🔒 Preservar datos inmutables de la reserva original
+            // Preservar datos inmutables de la reserva original
             dataModel.guid_reserva = existente.guid_reserva;
             dataModel.fecha_reserva_utc = existente.fecha_reserva_utc;
             dataModel.fecha_registro_utc = existente.fecha_registro_utc;
@@ -241,8 +256,6 @@ namespace MicroServicio.RedCar.Business.Services
             var actualizado = await _reservaDataService.ActualizarAsync(dataModel, null, null, cancellationToken);
 
             // ── Actualizar localización del vehículo ─────────────────────────────
-            // Al confirmar se asume que el viaje se realizó y el vehículo
-            // se encuentra ahora en la localización de devolución acordada.
             await _vehiculoDataService.ActualizarLocalizacionAsync(
                 existente.id_vehiculo,
                 existente.id_localizacion_devolucion,
@@ -250,8 +263,6 @@ namespace MicroServicio.RedCar.Business.Services
                 cancellationToken);
 
             // ── Aprobar conductores y extras ─────────────────────────────────────
-            // Al confirmar la reserva se cambia el estado de todos los conductores
-            // y extras activos a APR para reflejar la aprobación formal.
             await _reservaDataService.AprobarConductoresYExtrasAsync(
                 request.id_reserva,
                 request.modificado_por_usuario,
@@ -271,9 +282,6 @@ namespace MicroServicio.RedCar.Business.Services
         // =========================
         public async Task EliminarLogicoAsync(int id_reserva, string usuario, string? motivo, CancellationToken cancellationToken = default)
         {
-            // El motivo es obligatorio porque al eliminar se asigna estado_reserva = 'CAN',
-            // y el constraint CHK_RESERVAS_CANCELACION_MOTIVO_COHERENTE exige que
-            // motivo_cancelacion no sea nulo cuando el estado es CAN.
             if (string.IsNullOrWhiteSpace(motivo))
                 throw new ValidationException("El motivo es obligatorio para eliminar una reserva.");
 

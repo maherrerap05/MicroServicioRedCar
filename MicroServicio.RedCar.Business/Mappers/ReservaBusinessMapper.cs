@@ -128,6 +128,10 @@ namespace MicroServicio.RedCar.Business.Mappers
 
         public static ReservaConductorDataModel ToDataModel(ReservaConductorRequest request, int idReserva)
         {
+            // Solo se asigna fecha_modificacion_utc si viene modificado_por_usuario,
+            // para respetar el constraint CHK_RES_X_CON_MODIFICACION_USUARIO_COHERENTE
+            var tieneModificacion = !string.IsNullOrWhiteSpace(request.modificado_por_usuario);
+
             return new ReservaConductorDataModel
             {
                 id_reserva = idReserva,
@@ -140,31 +144,40 @@ namespace MicroServicio.RedCar.Business.Mappers
                 estado_reserva_conductor = request.estado_reserva_conductor,
 
                 fecha_registro_utc = DateTime.UtcNow,
-                creado_por_usuario = request.creado_por_usuario,
+                creado_por_usuario = request.creado_por_usuario!,
+
+                modificado_por_usuario = tieneModificacion ? request.modificado_por_usuario : null,  // ← AGREGAR
+                fecha_modificacion_utc = tieneModificacion ? DateTime.UtcNow : null,                 // ← AGREGAR
+
                 modificado_desde_ip = request.modificado_desde_ip,
-                origen_registro = request.origen_registro
+                origen_registro = request.origen_registro!
             };
         }
 
         public static ReservaExtraDataModel ToDataModel(
             ReservaExtraRequest request,
             int idReserva,
-            decimal valorUnitario)  // ← recibe el precio desde afuera
+            decimal valorUnitario)
         {
-            var subtotal = valorUnitario * request.cantidad;  
+            var subtotal = valorUnitario * request.cantidad;
+            var tieneModificacion = !string.IsNullOrWhiteSpace(request.modificado_por_usuario);
 
             return new ReservaExtraDataModel
             {
                 id_reserva = idReserva,
                 id_extra = request.id_extra,
                 cantidad = request.cantidad,
-                valor_unitario_extra = valorUnitario,   
-                subtotal_extra = subtotal,              
+                valor_unitario_extra = valorUnitario,
+                subtotal_extra = subtotal,
                 estado_reserva_extra = request.estado_reserva_extra,
                 fecha_registro_utc = DateTime.UtcNow,
-                creado_por_usuario = request.creado_por_usuario,
+                creado_por_usuario = request.creado_por_usuario!,
+
+                modificado_por_usuario = tieneModificacion ? request.modificado_por_usuario : null,  // ← AGREGAR
+                fecha_modificacion_utc = tieneModificacion ? DateTime.UtcNow : null,                 // ← AGREGAR
+
                 modificado_desde_ip = request.modificado_desde_ip,
-                origen_registro = request.origen_registro
+                origen_registro = request.origen_registro!
             };
         }
 
