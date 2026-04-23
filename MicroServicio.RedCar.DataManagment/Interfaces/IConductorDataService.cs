@@ -19,6 +19,8 @@ namespace MicroServicio.RedCar.DataManagement.Interfaces
 
         Task<IReadOnlyList<ConductorDataModel>> ObtenerTodosAsync(CancellationToken cancellationToken = default);
 
+        Task<DataPagedResult<ConductorDataModel>> BuscarAsync(ConductorFiltroDataModel filtro, CancellationToken cancellationToken = default);
+
         // =========================
         // COMANDOS
         // =========================

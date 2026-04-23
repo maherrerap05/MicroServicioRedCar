@@ -4,8 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using MicroServicio.RedCar.Api.Models.Common;
 using MicroServicio.RedCar.Business.DTOs.Conductor;
 using MicroServicio.RedCar.Business.Interfaces;
+using MicroServicio.RedCar.DataManagement.Models;
 
-namespace MicroServicio.RedCar.Api.Controllers.V1;
+namespace MicroServicio.RedCar.Api.Controllers.V1.Internal;
 
 [ApiController]
 [ApiVersion("1.0")]
@@ -81,6 +82,16 @@ public class ConductoresController : ControllerBase
         var result = await _conductorService.ObtenerPorLicenciaAsync(numeroLicencia, cancellationToken);
 
         return Ok(ApiResponse<ConductorResponse>.Ok(result, "Consulta exitosa."));
+    }
+
+    [HttpPost("buscar")]
+    [ProducesResponseType(typeof(ApiResponse<DataPagedResult<ConductorResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Buscar([FromBody] ConductorFiltroRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _conductorService.BuscarAsync(request, cancellationToken);
+
+        return Ok(ApiResponse<DataPagedResult<ConductorResponse>>.Ok(result, "Consulta paginada exitosa."));
     }
 
     // =========================

@@ -70,6 +70,39 @@ namespace MicroServicio.RedCar.DataManagement.Services
                 .ToList();
         }
 
+        public async Task<DataPagedResult<ConductorDataModel>> BuscarAsync(ConductorFiltroDataModel filtro, CancellationToken cancellationToken = default)
+        {
+            var pagedEntities = await _unitOfWork.ConductorRepository.BuscarAsync(
+                filtro.codigo_conductor,
+                filtro.tipo_identificacion,
+                filtro.numero_identificacion,
+                filtro.con_nombre1,
+                filtro.con_nombre2,
+                filtro.con_apellido1,
+                filtro.con_apellido2,
+                filtro.numero_licencia,
+                filtro.fecha_vencimiento_licencia_desde,
+                filtro.fecha_vencimiento_licencia_hasta,
+                filtro.edad_conductor,
+                filtro.con_telefono,
+                filtro.con_correo,
+                filtro.estado_conductor,
+                filtro.origen_registro,
+                filtro.PageNumber,
+                filtro.PageSize,
+                cancellationToken);
+
+            return new DataPagedResult<ConductorDataModel>
+            {
+                Items = pagedEntities.Items
+                    .Select(ConductorDataMapper.ToDataModel)
+                    .ToList(),
+                TotalRecords = pagedEntities.TotalRecords,
+                PageNumber = pagedEntities.PageNumber,
+                PageSize = pagedEntities.PageSize
+            };
+        }
+
         // =========================
         // COMANDOS
         // =========================

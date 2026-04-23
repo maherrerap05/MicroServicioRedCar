@@ -4,6 +4,7 @@ using MicroServicio.RedCar.Business.Interfaces;
 using MicroServicio.RedCar.Business.Mappers;
 using MicroServicio.RedCar.Business.Validators;
 using MicroServicio.RedCar.DataManagement.Interfaces;
+using MicroServicio.RedCar.DataManagement.Models;
 
 namespace MicroServicio.RedCar.Business.Services
 {
@@ -78,6 +79,29 @@ namespace MicroServicio.RedCar.Business.Services
                 throw new NotFoundException("No se pudo actualizar el conductor.");
 
             return ConductorBusinessMapper.ToResponse(actualizado);
+        }
+
+        // =========================
+        // BUSCAR
+        // =========================
+        public async Task<DataPagedResult<ConductorResponse>> BuscarAsync(ConductorFiltroRequest request, CancellationToken cancellationToken = default)
+        {
+            var errors = ConductorValidator.ValidarFiltro(request);
+            if (errors.Any())
+                throw new ValidationException("Los parámetros de búsqueda son inválidos.", errors);
+
+            var filtro = ConductorBusinessMapper.ToFiltroDataModel(request);
+            var resultado = await _conductorDataService.BuscarAsync(filtro, cancellationToken);
+
+            return new DataPagedResult<ConductorResponse>
+            {
+                Items = resultado.Items
+                    .Select(ConductorBusinessMapper.ToResponse)
+                    .ToList(),
+                TotalRecords = resultado.TotalRecords,
+                PageNumber = resultado.PageNumber,
+                PageSize = resultado.PageSize
+            };
         }
 
         // =========================

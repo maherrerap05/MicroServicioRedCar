@@ -6,7 +6,7 @@ using MicroServicio.RedCar.Business.DTOs.Factura;
 using MicroServicio.RedCar.Business.Interfaces;
 using MicroServicio.RedCar.DataManagement.Models;
 
-namespace MicroServicio.RedCar.Api.Controllers.V1;
+namespace MicroServicio.RedCar.Api.Controllers.V1.Internal;
 
 [ApiController]
 [ApiVersion("1.0")]

@@ -10,7 +10,7 @@ using MicroServicio.RedCar.Api.Models.Settings;
 using MicroServicio.RedCar.Business.DTOs.Auth;
 using MicroServicio.RedCar.Business.Interfaces;
 
-namespace MicroServicio.RedCar.Api.Controllers.V1;
+namespace MicroServicio.RedCar.Api.Controllers.V1.Auth;
 
 [ApiController]
 [ApiVersion("1.0")]

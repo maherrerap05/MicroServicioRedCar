@@ -1,4 +1,5 @@
 ﻿using MicroServicio.RedCar.Business.DTOs.Conductor;
+using MicroServicio.RedCar.DataManagement.Models;
 
 namespace MicroServicio.RedCar.Business.Interfaces
 {
@@ -19,6 +20,8 @@ namespace MicroServicio.RedCar.Business.Interfaces
         Task<ConductorResponse> ObtenerPorLicenciaAsync(string numero_licencia, CancellationToken cancellationToken = default);
 
         Task<IReadOnlyList<ConductorResponse>> ObtenerTodosAsync(CancellationToken cancellationToken = default);
+
+        Task<DataPagedResult<ConductorResponse>> BuscarAsync(ConductorFiltroRequest request, CancellationToken cancellationToken = default);
 
         Task EliminarLogicoAsync(int id_conductor, string usuario, CancellationToken cancellationToken = default);
     }
