@@ -21,7 +21,6 @@ namespace MicroServicio.RedCar.DataAccess.Repositories
         {
             return await _context.Facturas
                 .AsNoTracking()
-                .Where(f => !f.es_eliminado)
                 .OrderBy(f => f.id_factura)
                 .ToListAsync(cancellationToken);
         }

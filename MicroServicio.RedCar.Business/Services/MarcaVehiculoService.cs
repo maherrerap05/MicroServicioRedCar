@@ -114,9 +114,12 @@ namespace MicroServicio.RedCar.Business.Services
             return updated is null ? null : MarcaVehiculoBusinessMapper.ToResponse(updated);
         }
 
-        public async Task<bool> EliminarAsync(int id, string usuario, string? motivo)
+        public async Task<bool> EliminarAsync(int id, string usuario, string? motivo, string? ip)
         {
-            return await _dataService.EliminarLogicoAsync(id, usuario, motivo);
+            if (string.IsNullOrWhiteSpace(motivo))
+                throw new ArgumentException("El motivo es obligatorio para inhabilitar una marca de vehículo.");
+
+            return await _dataService.EliminarLogicoAsync(id, usuario, motivo, ip, CancellationToken.None);
         }
     }
 }

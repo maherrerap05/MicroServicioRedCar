@@ -131,6 +131,7 @@ public class MarcaVehiculosController : ControllerBase
     [HttpDelete("{id:int}")]
     [Authorize(Roles = "ADMIN")]
     [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> EliminarLogico(int id, [FromQuery] string? motivo)
     {
@@ -139,7 +140,9 @@ public class MarcaVehiculosController : ControllerBase
             User.FindFirst("unique_name")?.Value ??
             "api_user";
 
-        var eliminado = await _marcaVehiculoService.EliminarAsync(id, usuario, motivo);
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+        var eliminado = await _marcaVehiculoService.EliminarAsync(id, usuario, motivo, ip);
 
         if (!eliminado)
             return NotFound(ApiErrorResponse.Fail("Marca de vehículo no encontrada."));

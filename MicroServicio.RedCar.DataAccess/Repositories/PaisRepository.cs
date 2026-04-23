@@ -21,7 +21,6 @@ namespace MicroServicio.RedCar.DataAccess.Repositories
         {
             return await _context.Paises
                 .AsNoTracking()
-                .Where(p => !p.es_eliminado)
                 .OrderBy(p => p.id_pais)
                 .ToListAsync(cancellationToken);
         }

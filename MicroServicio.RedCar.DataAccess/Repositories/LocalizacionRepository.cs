@@ -21,7 +21,6 @@ namespace MicroServicio.RedCar.DataAccess.Repositories
         {
             return await _context.Localizaciones
                 .AsNoTracking()
-                .Where(l => !l.es_eliminado)
                 .OrderBy(l => l.id_localizacion)
                 .ToListAsync(cancellationToken);
         }
@@ -30,7 +29,7 @@ namespace MicroServicio.RedCar.DataAccess.Repositories
         {
             return await _context.Localizaciones
                 .AsNoTracking()
-                .FirstOrDefaultAsync(l => l.id_localizacion == id_localizacion && !l.es_eliminado, cancellationToken);
+                .FirstOrDefaultAsync(l => l.id_localizacion == id_localizacion, cancellationToken);
         }
 
         public async Task<LocalizacionEntity?> ObtenerParaActualizarAsync(int id_localizacion, CancellationToken cancellationToken = default)
@@ -43,14 +42,14 @@ namespace MicroServicio.RedCar.DataAccess.Repositories
         {
             return await _context.Localizaciones
                 .AsNoTracking()
-                .FirstOrDefaultAsync(l => l.localizacion_guid == localizacion_guid && !l.es_eliminado, cancellationToken);
+                .FirstOrDefaultAsync(l => l.localizacion_guid == localizacion_guid, cancellationToken);
         }
 
         public async Task<LocalizacionEntity?> ObtenerPorCodigoAsync(string codigo_localizacion, CancellationToken cancellationToken = default)
         {
             return await _context.Localizaciones
                 .AsNoTracking()
-                .FirstOrDefaultAsync(l => l.codigo_localizacion == codigo_localizacion && !l.es_eliminado, cancellationToken);
+                .FirstOrDefaultAsync(l => l.codigo_localizacion == codigo_localizacion, cancellationToken);
         }
 
         // =========================
@@ -73,7 +72,7 @@ namespace MicroServicio.RedCar.DataAccess.Repositories
         {
             return await _context.Localizaciones
                 .AsNoTracking()
-                .AnyAsync(l => l.codigo_localizacion == codigo_localizacion && !l.es_eliminado, cancellationToken);
+                .AnyAsync(l => l.codigo_localizacion == codigo_localizacion, cancellationToken);
         }
     }
 }

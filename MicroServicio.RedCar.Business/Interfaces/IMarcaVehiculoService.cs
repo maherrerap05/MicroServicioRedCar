@@ -20,6 +20,6 @@ namespace MicroServicio.RedCar.Business.Interfaces
         // =========================
         Task<MarcaVehiculoResponse> CrearAsync(CrearMarcaVehiculoRequest request);
         Task<MarcaVehiculoResponse?> ActualizarAsync(ActualizarMarcaVehiculoRequest request);
-        Task<bool> EliminarAsync(int id, string usuario, string? motivo);
+        Task<bool> EliminarAsync(int id, string usuario, string? motivo, string? ip);
     }
 }
