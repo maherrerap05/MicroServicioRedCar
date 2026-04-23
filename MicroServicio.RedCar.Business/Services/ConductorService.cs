@@ -167,9 +167,12 @@ namespace MicroServicio.RedCar.Business.Services
         // =========================
         // ELIMINAR LÓGICO
         // =========================
-        public async Task EliminarLogicoAsync(int id_conductor, string usuario, CancellationToken cancellationToken = default)
+        public async Task EliminarLogicoAsync(int id_conductor, string usuario, string? motivo, string? ip, CancellationToken cancellationToken = default)
         {
-            var eliminado = await _conductorDataService.EliminarLogicoAsync(id_conductor, usuario, null, cancellationToken);
+            if (string.IsNullOrWhiteSpace(motivo))
+                throw new ValidationException("El motivo es obligatorio para inhabilitar un conductor.");
+
+            var eliminado = await _conductorDataService.EliminarLogicoAsync(id_conductor, usuario, motivo, ip, cancellationToken);
 
             if (!eliminado)
                 throw new NotFoundException("No se encontró el conductor para eliminar.");

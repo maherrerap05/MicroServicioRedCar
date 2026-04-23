@@ -19,6 +19,6 @@ namespace MicroServicio.RedCar.Business.Interfaces
 
         Task<DataPagedResult<LocalizacionResponse>> BuscarAsync(LocalizacionFiltroRequest request, CancellationToken cancellationToken = default);
 
-        Task EliminarLogicoAsync(int id_localizacion, string usuario, CancellationToken cancellationToken = default);
+        Task EliminarLogicoAsync(int id_localizacion, string usuario, string? motivo, string? ip, CancellationToken cancellationToken = default);
     }
 }

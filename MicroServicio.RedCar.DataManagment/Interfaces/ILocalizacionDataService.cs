@@ -16,7 +16,7 @@ namespace MicroServicio.RedCar.DataManagement.Interfaces
 
         Task<LocalizacionDataModel?> ActualizarAsync(LocalizacionDataModel model, CancellationToken cancellationToken = default);
 
-        Task<bool> EliminarLogicoAsync(int id_localizacion, string usuario, string? motivo, CancellationToken cancellationToken = default);
+        Task<bool> EliminarLogicoAsync(int id_localizacion, string usuario, string? motivo, string? ip, CancellationToken cancellationToken = default);
 
         Task<bool> ExistePorCodigoAsync(string codigo_localizacion, CancellationToken cancellationToken = default);
     }

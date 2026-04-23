@@ -96,7 +96,7 @@ namespace MicroServicio.RedCar.DataManagement.Services
             return ExtraDataMapper.ToDataModel(entity);
         }
 
-        public async Task<bool> EliminarLogicoAsync(int id_extra, string usuario, string? motivo, CancellationToken cancellationToken = default)
+        public async Task<bool> EliminarLogicoAsync(int id_extra, string usuario, string? motivo, string? ip, CancellationToken cancellationToken = default)
         {
             var entity = await _unitOfWork.ExtraRepository.ObtenerParaActualizarAsync(id_extra, cancellationToken);
 
@@ -109,6 +109,7 @@ namespace MicroServicio.RedCar.DataManagement.Services
             entity.fecha_modificacion_utc = DateTime.UtcNow;
             entity.modificado_por_usuario = usuario;
             entity.motivo_inhabilitacion = motivo;
+            entity.modificado_desde_ip = ip;          // ← nuevo
 
             _unitOfWork.ExtraRepository.Actualizar(entity);
             await _unitOfWork.SaveChangesAsync(cancellationToken);

@@ -160,7 +160,7 @@ namespace MicroServicio.RedCar.DataManagement.Services
             return ConductorDataMapper.ToDataModel(entity);
         }
 
-        public async Task<bool> EliminarLogicoAsync(int id_conductor, string usuario, string? motivo, CancellationToken cancellationToken = default)
+        public async Task<bool> EliminarLogicoAsync(int id_conductor, string usuario, string? motivo, string? ip, CancellationToken cancellationToken = default)
         {
             var entity = await _unitOfWork.ConductorRepository.ObtenerParaActualizarAsync(id_conductor, cancellationToken);
 
@@ -173,6 +173,7 @@ namespace MicroServicio.RedCar.DataManagement.Services
             entity.fecha_modificacion_utc = DateTime.UtcNow;
             entity.modificado_por_usuario = usuario;
             entity.motivo_inhabilitacion = motivo;
+            entity.modificado_desde_ip = ip;          // ← nuevo
 
             _unitOfWork.ConductorRepository.Actualizar(entity);
             await _unitOfWork.SaveChangesAsync(cancellationToken);

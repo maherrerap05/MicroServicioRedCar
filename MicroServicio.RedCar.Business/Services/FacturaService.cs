@@ -279,9 +279,12 @@ namespace MicroServicio.RedCar.Business.Services
         // =========================
         // ELIMINAR LÓGICO
         // =========================
-        public async Task EliminarLogicoAsync(int id_factura, string usuario, CancellationToken cancellationToken = default)
+        public async Task EliminarLogicoAsync(int id_factura, string usuario, string? motivo, string? ip, CancellationToken cancellationToken = default)
         {
-            var eliminado = await _facturaDataService.EliminarLogicoAsync(id_factura, usuario, null, cancellationToken);
+            if (string.IsNullOrWhiteSpace(motivo))
+                throw new ValidationException("El motivo es obligatorio para inhabilitar una factura.");
+
+            var eliminado = await _facturaDataService.EliminarLogicoAsync(id_factura, usuario, motivo, ip, cancellationToken);
 
             if (!eliminado)
                 throw new NotFoundException("No se encontró la factura para eliminar.");

@@ -29,6 +29,6 @@ namespace MicroServicio.RedCar.Business.Interfaces
 
         Task<FacturaResponse> AnularAsync(AnularFacturaRequest request, CancellationToken cancellationToken = default);
 
-        Task EliminarLogicoAsync(int id_factura, string usuario, CancellationToken cancellationToken = default);
+        Task EliminarLogicoAsync(int id_factura, string usuario, string? motivo, string? ip, CancellationToken cancellationToken = default);
     }
 }

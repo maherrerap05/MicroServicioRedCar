@@ -28,7 +28,7 @@ namespace MicroServicio.RedCar.DataManagement.Interfaces
 
         Task<ConductorDataModel?> ActualizarAsync(ConductorDataModel model, CancellationToken cancellationToken = default);
 
-        Task<bool> EliminarLogicoAsync(int id_conductor, string usuario, string? motivo, CancellationToken cancellationToken = default);
+        Task<bool> EliminarLogicoAsync(int id_conductor, string usuario, string? motivo, string? ip, CancellationToken cancellationToken = default);
 
         // =========================
         // VALIDACIONES

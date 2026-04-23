@@ -30,7 +30,7 @@ namespace MicroServicio.RedCar.DataAccess.Repositories
         {
             return await _context.CategoriasVehiculo
                 .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.id_categoria_vehiculo == id_categoria_vehiculo && !c.es_eliminado, cancellationToken);
+                .FirstOrDefaultAsync(c => c.id_categoria_vehiculo == id_categoria_vehiculo, cancellationToken);
         }
 
         public async Task<CategoriaVehiculoEntity?> ObtenerParaActualizarAsync(int id_categoria_vehiculo, CancellationToken cancellationToken = default)
@@ -43,21 +43,21 @@ namespace MicroServicio.RedCar.DataAccess.Repositories
         {
             return await _context.CategoriasVehiculo
                 .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.categoria_vehiculo_guid == categoria_vehiculo_guid && !c.es_eliminado, cancellationToken);
+                .FirstOrDefaultAsync(c => c.categoria_vehiculo_guid == categoria_vehiculo_guid, cancellationToken);
         }
 
         public async Task<CategoriaVehiculoEntity?> ObtenerPorCodigoAsync(string codigo_categoria_vehiculo, CancellationToken cancellationToken = default)
         {
             return await _context.CategoriasVehiculo
                 .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.codigo_categoria_vehiculo == codigo_categoria_vehiculo && !c.es_eliminado, cancellationToken);
+                .FirstOrDefaultAsync(c => c.codigo_categoria_vehiculo == codigo_categoria_vehiculo, cancellationToken);
         }
 
         public async Task<CategoriaVehiculoEntity?> ObtenerPorNombreAsync(string nombre_categoria_vehiculo, CancellationToken cancellationToken = default)
         {
             return await _context.CategoriasVehiculo
                 .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.nombre_categoria_vehiculo == nombre_categoria_vehiculo && !c.es_eliminado, cancellationToken);
+                .FirstOrDefaultAsync(c => c.nombre_categoria_vehiculo == nombre_categoria_vehiculo, cancellationToken);
         }
 
         // =========================
@@ -80,14 +80,14 @@ namespace MicroServicio.RedCar.DataAccess.Repositories
         {
             return await _context.CategoriasVehiculo
                 .AsNoTracking()
-                .AnyAsync(c => c.codigo_categoria_vehiculo == codigo_categoria_vehiculo && !c.es_eliminado, cancellationToken);
+                .AnyAsync(c => c.codigo_categoria_vehiculo == codigo_categoria_vehiculo, cancellationToken);
         }
 
         public async Task<bool> ExistePorNombreAsync(string nombre_categoria_vehiculo, CancellationToken cancellationToken = default)
         {
             return await _context.CategoriasVehiculo
                 .AsNoTracking()
-                .AnyAsync(c => c.nombre_categoria_vehiculo == nombre_categoria_vehiculo && !c.es_eliminado, cancellationToken);
+                .AnyAsync(c => c.nombre_categoria_vehiculo == nombre_categoria_vehiculo, cancellationToken);
         }
     }
 }

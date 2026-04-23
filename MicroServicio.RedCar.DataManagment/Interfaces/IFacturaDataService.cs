@@ -30,7 +30,7 @@ namespace MicroServicio.RedCar.DataManagement.Interfaces
 
         Task<FacturaDataModel?> ActualizarAsync(FacturaDataModel model, CancellationToken cancellationToken = default);
 
-        Task<bool> EliminarLogicoAsync(int id_factura, string usuario, string? motivo, CancellationToken cancellationToken = default);
+        Task<bool> EliminarLogicoAsync(int id_factura, string usuario, string? motivo, string? ip, CancellationToken cancellationToken = default);
 
         // =========================
         // VALIDACIONES

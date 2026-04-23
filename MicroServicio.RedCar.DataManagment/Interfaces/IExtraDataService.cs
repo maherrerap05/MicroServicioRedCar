@@ -23,7 +23,7 @@ namespace MicroServicio.RedCar.DataManagement.Interfaces
 
         Task<ExtraDataModel?> ActualizarAsync(ExtraDataModel model, CancellationToken cancellationToken = default);
 
-        Task<bool> EliminarLogicoAsync(int id_extra, string usuario, string? motivo, CancellationToken cancellationToken = default);
+        Task<bool> EliminarLogicoAsync(int id_extra, string usuario, string? motivo, string? ip, CancellationToken cancellationToken = default);
 
         // =========================
         // VALIDACIONES

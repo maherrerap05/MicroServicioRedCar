@@ -156,7 +156,7 @@ namespace MicroServicio.RedCar.DataManagement.Services
             return FacturaDataMapper.ToDataModel(entity);
         }
 
-        public async Task<bool> EliminarLogicoAsync(int id_factura, string usuario, string? motivo, CancellationToken cancellationToken = default)
+        public async Task<bool> EliminarLogicoAsync(int id_factura, string usuario, string? motivo, string? ip, CancellationToken cancellationToken = default)
         {
             var entity = await _unitOfWork.FacturaRepository.ObtenerParaActualizarAsync(id_factura, cancellationToken);
 
@@ -169,6 +169,7 @@ namespace MicroServicio.RedCar.DataManagement.Services
             entity.fecha_modificacion_utc = DateTime.UtcNow;
             entity.modificado_por_usuario = usuario;
             entity.motivo_inhabilitacion = motivo;
+            entity.modificacion_ip = ip;              // ← nuevo (nomenclatura propia de Facturas)
 
             _unitOfWork.FacturaRepository.Actualizar(entity);
             await _unitOfWork.SaveChangesAsync(cancellationToken);

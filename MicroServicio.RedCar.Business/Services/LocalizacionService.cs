@@ -156,9 +156,12 @@ namespace MicroServicio.RedCar.Business.Services
         // =========================
         // ELIMINAR
         // =========================
-        public async Task EliminarLogicoAsync(int id_localizacion, string usuario, CancellationToken cancellationToken = default)
+        public async Task EliminarLogicoAsync(int id_localizacion, string usuario, string? motivo, string? ip, CancellationToken cancellationToken = default)
         {
-            var eliminado = await _dataService.EliminarLogicoAsync(id_localizacion, usuario, null, cancellationToken);
+            if (string.IsNullOrWhiteSpace(motivo))
+                throw new ValidationException("El motivo es obligatorio para inhabilitar una localización.");
+
+            var eliminado = await _dataService.EliminarLogicoAsync(id_localizacion, usuario, motivo, ip, cancellationToken);
 
             if (!eliminado)
                 throw new NotFoundException("No se encontró la localización.");

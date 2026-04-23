@@ -223,9 +223,8 @@ public class ReservasController : ControllerBase
         return Ok(ApiResponse<ReservaResponse>.Ok(result, "Reserva creada exitosamente."));
     }
 
-    // Solo personal interno
     [HttpPut("{id:int}")]
-    [Authorize(Roles = "ADMIN,VENDEDOR")]
+    [Authorize(Roles = "ADMIN,VENDEDOR,CLIENTE")]
     [ProducesResponseType(typeof(ApiResponse<ReservaResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
@@ -262,7 +261,7 @@ public class ReservasController : ControllerBase
 
     // Solo personal interno
     [HttpPost("{id:int}/confirmar")]
-    [Authorize(Roles = "ADMIN,VENDEDOR")]
+    [Authorize(Roles = "ADMIN,VENDEDOR,CLIENTE")]
     [ProducesResponseType(typeof(ApiResponse<ReservaResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
@@ -286,7 +285,7 @@ public class ReservasController : ControllerBase
 
     // Solo ADMIN
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = "ADMIN")]
+    [Authorize(Roles = "ADMIN,CLIENTE")]
     [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]

@@ -119,15 +119,18 @@ public class ExtrasController : ControllerBase
     [HttpDelete("{id:int}")]
     [Authorize(Roles = "ADMIN")]
     [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> EliminarLogico(int id, CancellationToken cancellationToken)
+    public async Task<IActionResult> EliminarLogico(int id, [FromQuery] string? motivo, CancellationToken cancellationToken)
     {
         var usuario =
             User.Identity?.Name ??
             User.FindFirst("unique_name")?.Value ??
             "api_user";
 
-        await _extraService.EliminarLogicoAsync(id, usuario, cancellationToken);
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+        await _extraService.EliminarLogicoAsync(id, usuario, motivo, ip, cancellationToken);
 
         return Ok(ApiResponse<string>.Ok("OK", "Extra eliminado lógicamente."));
     }

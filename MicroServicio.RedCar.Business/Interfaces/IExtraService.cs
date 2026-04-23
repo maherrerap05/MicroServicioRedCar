@@ -19,6 +19,6 @@ namespace MicroServicio.RedCar.Business.Interfaces
 
         Task<DataPagedResult<ExtraResponse>> BuscarAsync(ExtraFiltroRequest request, CancellationToken cancellationToken = default);
 
-        Task EliminarLogicoAsync(int id_extra, string usuario, CancellationToken cancellationToken = default);
+        Task EliminarLogicoAsync(int id_extra, string usuario, string? motivo, string? ip, CancellationToken cancellationToken = default);
     }
 }
