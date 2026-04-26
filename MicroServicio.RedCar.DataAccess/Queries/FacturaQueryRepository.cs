@@ -33,7 +33,12 @@ namespace MicroServicio.RedCar.DataAccess.Queries
         {
             var query = _context.Facturas
                 .AsNoTracking()
-                .Where(f => !f.es_eliminado);
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(estado))
+            {
+                query = query.Where(f => f.estado == estado);
+            }
 
             if (!string.IsNullOrWhiteSpace(numero_factura))
             {
@@ -48,11 +53,6 @@ namespace MicroServicio.RedCar.DataAccess.Queries
             if (id_reserva.HasValue)
             {
                 query = query.Where(f => f.id_reserva == id_reserva.Value);
-            }
-
-            if (!string.IsNullOrWhiteSpace(estado))
-            {
-                query = query.Where(f => f.estado == estado);
             }
 
             if (!string.IsNullOrWhiteSpace(origen_canal_factura))

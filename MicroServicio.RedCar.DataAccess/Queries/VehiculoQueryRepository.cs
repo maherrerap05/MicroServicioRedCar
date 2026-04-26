@@ -35,7 +35,7 @@ namespace MicroServicio.RedCar.DataAccess.Queries
         {
             var query = _context.Vehiculos
                 .AsNoTracking()
-                .Where(v => !v.es_eliminado);
+                .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(codigo_interno_vehiculo))
             {
@@ -79,7 +79,14 @@ namespace MicroServicio.RedCar.DataAccess.Queries
 
             if (!string.IsNullOrWhiteSpace(estado_vehiculo))
             {
+                // filtra por el estado solicitado, incluyendo eliminados lógicamente
+                // para que el admin pueda ver todos los vehículos con ese estado
                 query = query.Where(v => v.estado_vehiculo == estado_vehiculo);
+            }
+            else
+            {
+                // sin filtro de estado: excluir eliminados lógicamente
+                query = query.Where(v => !v.es_eliminado);
             }
 
             if (precio_min.HasValue)

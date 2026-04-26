@@ -84,11 +84,46 @@ namespace MicroServicio.RedCar.DataAccess.Queries
         // BÚSQUEDA PAGINADA DE CLIENTES
         // ============================================
         public async Task<(IReadOnlyList<ClienteEntity> Items, int PageNumber, int PageSize, long TotalRecords)>
-            BuscarAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+            BuscarAsync(
+                string? tipo_identificacion,
+                string? numero_identificacion,
+                string? razon_social,
+                string? nombres,
+                string? apellidos,
+                string? correo,
+                string? telefono,
+                string? estado,
+                int pageNumber,
+                int pageSize,
+                CancellationToken cancellationToken = default)
         {
-            var query = _context.Clientes
-                .AsNoTracking()
-                .Where(c => !c.es_eliminado);
+            var query = _context.Clientes.AsNoTracking().AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(estado))
+            {
+                query = query.Where(c => c.estado == estado);
+            }
+
+            if (!string.IsNullOrWhiteSpace(tipo_identificacion))
+                query = query.Where(c => c.tipo_identificacion == tipo_identificacion);
+
+            if (!string.IsNullOrWhiteSpace(numero_identificacion))
+                query = query.Where(c => c.numero_identificacion.Contains(numero_identificacion));
+
+            if (!string.IsNullOrWhiteSpace(razon_social))
+                query = query.Where(c => c.razon_social != null && c.razon_social.Contains(razon_social));
+
+            if (!string.IsNullOrWhiteSpace(nombres))
+                query = query.Where(c => c.nombres.Contains(nombres));
+
+            if (!string.IsNullOrWhiteSpace(apellidos))
+                query = query.Where(c => c.apellidos.Contains(apellidos));
+
+            if (!string.IsNullOrWhiteSpace(correo))
+                query = query.Where(c => c.correo.Contains(correo));
+
+            if (!string.IsNullOrWhiteSpace(telefono))
+                query = query.Where(c => c.telefono != null && c.telefono.Contains(telefono));
 
             var totalRecords = await query.LongCountAsync(cancellationToken);
 

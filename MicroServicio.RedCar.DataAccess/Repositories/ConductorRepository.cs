@@ -89,8 +89,12 @@ namespace MicroServicio.RedCar.DataAccess.Repositories
         {
             var query = _context.Conductores
                 .AsNoTracking()
-                .Where(c => !c.es_eliminado)
                 .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(estado_conductor))
+            {
+                query = query.Where(c => c.estado_conductor == estado_conductor);
+            }
 
             if (!string.IsNullOrWhiteSpace(codigo_conductor))
                 query = query.Where(c => c.codigo_conductor.Contains(codigo_conductor));
@@ -130,9 +134,6 @@ namespace MicroServicio.RedCar.DataAccess.Repositories
 
             if (!string.IsNullOrWhiteSpace(con_correo))
                 query = query.Where(c => c.con_correo.Contains(con_correo));
-
-            if (!string.IsNullOrWhiteSpace(estado_conductor))
-                query = query.Where(c => c.estado_conductor == estado_conductor);
 
             if (!string.IsNullOrWhiteSpace(origen_registro))
                 query = query.Where(c => c.origen_registro == origen_registro);

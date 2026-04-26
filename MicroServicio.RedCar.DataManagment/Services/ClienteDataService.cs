@@ -64,6 +64,14 @@ namespace MicroServicio.RedCar.DataManagement.Services
         public async Task<DataPagedResult<ClienteDataModel>> BuscarAsync(ClienteFiltroDataModel filtro, CancellationToken cancellationToken = default)
         {
             var result = await _unitOfWork.ClienteQueryRepository.BuscarAsync(
+                filtro.tipo_identificacion,
+                filtro.numero_identificacion,
+                filtro.razon_social,
+                filtro.nombres,
+                filtro.apellidos,
+                filtro.correo,
+                filtro.telefono,
+                filtro.estado,
                 filtro.PageNumber,
                 filtro.PageSize,
                 cancellationToken);

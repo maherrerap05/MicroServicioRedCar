@@ -13,18 +13,26 @@ namespace MicroServicio.RedCar.Business.Services
         private readonly IReservaDataService _reservaDataService;
         private readonly IVehiculoDataService _vehiculoDataService;
         private readonly IExtraDataService _extraDataService;
+        private readonly IClienteDataService _clienteDataService;
+        private readonly ILocalizacionDataService _localizacionDataService;
+        private readonly IConductorDataService _conductorDataService;
 
-        // IVA fijo del 15% según normativa vigente
         private const decimal TasaIva = 0.15m;
 
         public ReservaService(
             IReservaDataService reservaDataService,
             IVehiculoDataService vehiculoDataService,
-            IExtraDataService extraDataService)
+            IExtraDataService extraDataService,
+            IClienteDataService clienteDataService,
+            ILocalizacionDataService localizacionDataService,
+            IConductorDataService conductorDataService)
         {
             _reservaDataService = reservaDataService;
             _vehiculoDataService = vehiculoDataService;
             _extraDataService = extraDataService;
+            _clienteDataService = clienteDataService;
+            _localizacionDataService = localizacionDataService;
+            _conductorDataService = conductorDataService;
         }
 
         // =========================
@@ -42,6 +50,36 @@ namespace MicroServicio.RedCar.Business.Services
             if (existeCodigo)
                 throw new ValidationException("Ya existe una reserva con el código indicado.");
 
+            // ── Validar que el cliente existe y está activo ──────────────────
+            var cliente = await _clienteDataService.ObtenerPorIdAsync(
+                request.id_cliente, cancellationToken);
+
+            if (cliente is null)
+                throw new NotFoundException($"No se encontró el cliente con id {request.id_cliente}.");
+
+            if (cliente.estado != "ACT")
+                throw new BusinessException($"El cliente con id {request.id_cliente} no está activo. Estado actual: {cliente.estado}.");
+
+            // ── Validar localización de recogida activa ──────────────────────
+            var locRecogida = await _localizacionDataService.ObtenerPorIdAsync(
+                request.id_localizacion_recogida, cancellationToken);
+
+            if (locRecogida is null)
+                throw new NotFoundException($"No se encontró la localización de recogida con id {request.id_localizacion_recogida}.");
+
+            if (locRecogida.estado_localizacion != "ACT")
+                throw new BusinessException($"La localización de recogida con id {request.id_localizacion_recogida} no está activa.");
+
+            // ── Validar localización de devolución activa ────────────────────
+            var locDevolucion = await _localizacionDataService.ObtenerPorIdAsync(
+                request.id_localizacion_devolucion, cancellationToken);
+
+            if (locDevolucion is null)
+                throw new NotFoundException($"No se encontró la localización de devolución con id {request.id_localizacion_devolucion}.");
+
+            if (locDevolucion.estado_localizacion != "ACT")
+                throw new BusinessException($"La localización de devolución con id {request.id_localizacion_devolucion} no está activa.");
+
             var fechaInicio = request.fecha_recogida.Date + request.hora_recogida;
             var fechaFin = request.fecha_devolucion.Date + request.hora_devolucion;
 
@@ -55,7 +93,7 @@ namespace MicroServicio.RedCar.Business.Services
             if (!disponible)
                 throw new BusinessException("El vehículo no está disponible en el rango de fechas seleccionado.");
 
-            // ── Obtener precio base del vehículo ─────────────────────────────
+            // ── Obtener y validar el vehículo ────────────────────────────────
             var vehiculo = await _vehiculoDataService.ObtenerPorIdAsync(
                 request.id_vehiculo,
                 cancellationToken);
@@ -63,12 +101,27 @@ namespace MicroServicio.RedCar.Business.Services
             if (vehiculo is null)
                 throw new NotFoundException($"No se encontró el vehículo con id {request.id_vehiculo}.");
 
-            // ── Conductores ──────────────────────────────────────────────────
-            var conductores = request.conductores
-                .Select(x => ReservaBusinessMapper.ToDataModel(x, 0))
-                .ToList();
+            if (vehiculo.estado_vehiculo != "ACT")
+                throw new BusinessException($"El vehículo con id {request.id_vehiculo} no está activo. Estado actual: {vehiculo.estado_vehiculo}.");
 
-            // ── Extras: consulta precio real de cada extra ───────────────────
+            // ── Conductores: validar existencia y estado activo ──────────────
+            var conductores = new List<ReservaConductorDataModel>();
+
+            foreach (var conductorRequest in request.conductores)
+            {
+                var conductorData = await _conductorDataService.ObtenerPorIdAsync(
+                    conductorRequest.id_conductor, cancellationToken);
+
+                if (conductorData is null)
+                    throw new NotFoundException($"No se encontró el conductor con id {conductorRequest.id_conductor}.");
+
+                if (conductorData.estado_conductor != "ACT")
+                    throw new BusinessException($"El conductor con id {conductorRequest.id_conductor} no está activo. Estado actual: {conductorData.estado_conductor}.");
+
+                conductores.Add(ReservaBusinessMapper.ToDataModel(conductorRequest, 0));
+            }
+
+            // ── Extras: validar existencia, estado activo y obtener precio ───
             var extras = new List<ReservaExtraDataModel>();
 
             foreach (var extraRequest in request.extras)
@@ -78,8 +131,10 @@ namespace MicroServicio.RedCar.Business.Services
                     cancellationToken);
 
                 if (extraData is null)
-                    throw new NotFoundException(
-                        $"No se encontró el extra con id {extraRequest.id_extra}.");
+                    throw new NotFoundException($"No se encontró el extra con id {extraRequest.id_extra}.");
+
+                if (extraData.estado_extra != "ACT")
+                    throw new BusinessException($"El extra con id {extraRequest.id_extra} no está activo. Estado actual: {extraData.estado_extra}.");
 
                 extras.Add(ReservaBusinessMapper.ToDataModel(
                     extraRequest,
@@ -125,7 +180,7 @@ namespace MicroServicio.RedCar.Business.Services
             if (existente is null)
                 throw new NotFoundException("No se encontró la reserva.");
 
-            // ── Obtener precio base del vehículo ─────────────────────────────
+            // ── Obtener y validar el vehículo ────────────────────────────────
             var vehiculo = await _vehiculoDataService.ObtenerPorIdAsync(
                 request.id_vehiculo,
                 cancellationToken);
@@ -133,8 +188,10 @@ namespace MicroServicio.RedCar.Business.Services
             if (vehiculo is null)
                 throw new NotFoundException($"No se encontró el vehículo con id {request.id_vehiculo}.");
 
-            // ── Conductores ──────────────────────────────────────────────────
-            // 🔒 Se propaga modificado_por_usuario del padre si el hijo no lo trae
+            if (vehiculo.estado_vehiculo != "ACT")
+                throw new BusinessException($"El vehículo con id {request.id_vehiculo} no está activo. Estado actual: {vehiculo.estado_vehiculo}.");
+
+            // ── Conductores: validar existencia y estado activo ──────────────
             var conductores = new List<ReservaConductorDataModel>();
 
             foreach (var conductorRequest in request.conductores)
@@ -142,11 +199,19 @@ namespace MicroServicio.RedCar.Business.Services
                 if (string.IsNullOrWhiteSpace(conductorRequest.modificado_por_usuario))
                     conductorRequest.modificado_por_usuario = request.modificado_por_usuario;
 
+                var conductorData = await _conductorDataService.ObtenerPorIdAsync(
+                    conductorRequest.id_conductor, cancellationToken);
+
+                if (conductorData is null)
+                    throw new NotFoundException($"No se encontró el conductor con id {conductorRequest.id_conductor}.");
+
+                if (conductorData.estado_conductor != "ACT")
+                    throw new BusinessException($"El conductor con id {conductorRequest.id_conductor} no está activo. Estado actual: {conductorData.estado_conductor}.");
+
                 conductores.Add(ReservaBusinessMapper.ToDataModel(conductorRequest, request.id_reserva));
             }
 
-            // ── Extras: consulta precio real de cada extra ───────────────────
-            // 🔒 Se propaga modificado_por_usuario del padre si el hijo no lo trae
+            // ── Extras: validar existencia, estado activo y obtener precio ───
             var extras = new List<ReservaExtraDataModel>();
 
             foreach (var extraRequest in request.extras)
@@ -159,8 +224,10 @@ namespace MicroServicio.RedCar.Business.Services
                     cancellationToken);
 
                 if (extraData is null)
-                    throw new NotFoundException(
-                        $"No se encontró el extra con id {extraRequest.id_extra}.");
+                    throw new NotFoundException($"No se encontró el extra con id {extraRequest.id_extra}.");
+
+                if (extraData.estado_extra != "ACT")
+                    throw new BusinessException($"El extra con id {extraRequest.id_extra} no está activo. Estado actual: {extraData.estado_extra}.");
 
                 extras.Add(ReservaBusinessMapper.ToDataModel(
                     extraRequest,
@@ -255,20 +322,20 @@ namespace MicroServicio.RedCar.Business.Services
 
             var actualizado = await _reservaDataService.ActualizarAsync(dataModel, null, null, cancellationToken);
 
-            // ── Actualizar localización del vehículo ─────────────────────────────
+            // ── Actualizar localización del vehículo ─────────────────────────
             await _vehiculoDataService.ActualizarLocalizacionAsync(
                 existente.id_vehiculo,
                 existente.id_localizacion_devolucion,
                 request.modificado_por_usuario,
                 cancellationToken);
 
-            // ── Aprobar conductores y extras ─────────────────────────────────────
+            // ── Aprobar conductores y extras ─────────────────────────────────
             await _reservaDataService.AprobarConductoresYExtrasAsync(
                 request.id_reserva,
                 request.modificado_por_usuario,
                 cancellationToken);
 
-            // ── Consultar conductores y extras para el response ───────────────────
+            // ── Consultar conductores y extras para el response ───────────────
             var conductores = await _reservaDataService.ObtenerConductoresPorReservaAsync(
                 request.id_reserva, cancellationToken);
             var extras = await _reservaDataService.ObtenerExtrasPorReservaAsync(
