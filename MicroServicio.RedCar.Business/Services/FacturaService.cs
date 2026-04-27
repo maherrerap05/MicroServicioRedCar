@@ -61,51 +61,28 @@ namespace MicroServicio.RedCar.Business.Services
         // =========================
         // ACTUALIZAR
         // =========================
+        // =========================
+        // ACTUALIZAR
+        // =========================
         public async Task<FacturaResponse> ActualizarAsync(ActualizarFacturaRequest request, CancellationToken cancellationToken = default)
         {
             var errors = FacturaValidator.ValidarActualizacion(request);
             if (errors.Any())
                 throw new ValidationException("La solicitud de actualización de factura es inválida.", errors);
 
-            // 1. Verificar que la factura existe
             var existente = await _facturaDataService.ObtenerPorIdAsync(request.id_factura, cancellationToken);
             if (existente is null)
                 throw new NotFoundException("No se encontró la factura.");
 
-            // 2. Verificar que la nueva reserva existe
-            var reserva = await _reservaDataService.ObtenerPorIdAsync(request.id_reserva, cancellationToken);
-            if (reserva is null)
-                throw new NotFoundException("No se encontró la reserva indicada.");
+            existente.observaciones_factura = request.observaciones_factura;
+            existente.origen_canal_factura = request.origen_canal_factura;
+            existente.modificado_por_usuario = request.modificado_por_usuario;
+            existente.fecha_modificacion_utc = DateTime.UtcNow;
+            existente.modificacion_ip = request.modificacion_ip;
+            existente.servicio_origen = request.servicio_origen;
+            // motivo_inhabilitacion NO se toca — lo gestiona el flujo de eliminación
 
-            // 3. Verificar que la reserva está confirmada
-            if (reserva.estado_reserva != "CON")
-                throw new BusinessException(
-                    reserva.estado_reserva == "CAN"
-                        ? "No se puede asociar una factura a una reserva cancelada."
-                        : "Solo se pueden asociar facturas a reservas confirmadas.");
-
-            // 4. Si cambió la reserva, verificar que la nueva no tenga ya otra factura
-            if (request.id_reserva != existente.id_reserva)
-            {
-                var facturaEnNuevaReserva = await _facturaDataService.ObtenerFacturaPorReservaAsync(request.id_reserva, cancellationToken);
-                if (facturaEnNuevaReserva is not null)
-                    throw new BusinessException("Ya existe una factura asociada a la reserva indicada.");
-            }
-
-            // 5. Mapear y poblar campos derivados de la reserva
-            var model = FacturaBusinessMapper.ToDataModel(request);
-
-            model.id_cliente = reserva.id_cliente;
-            model.subtotal = reserva.subtotal_reserva;
-            model.valor_iva = reserva.valor_iva;
-            model.total = reserva.total_reserva;
-
-            // 6. Preservar auditoría de creación
-            model.guid_factura = existente.guid_factura;
-            model.fecha_registro_utc = existente.fecha_registro_utc;
-            model.creado_por_usuario = existente.creado_por_usuario;
-
-            var actualizado = await _facturaDataService.ActualizarAsync(model, cancellationToken);
+            var actualizado = await _facturaDataService.ActualizarAsync(existente, cancellationToken);
 
             if (actualizado is null)
                 throw new NotFoundException("No se pudo actualizar la factura.");

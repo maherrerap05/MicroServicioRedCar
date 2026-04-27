@@ -33,23 +33,15 @@ namespace MicroServicio.RedCar.Business.Mappers
             return new FacturaDataModel
             {
                 id_factura = request.id_factura,
-                numero_factura = request.numero_factura,
-
-                // id_cliente y montos eliminados: se asignan desde la reserva en FacturaService
-                id_reserva = request.id_reserva,
 
                 observaciones_factura = request.observaciones_factura,
                 origen_canal_factura = request.origen_canal_factura,
-
-                estado = request.estado,
 
                 modificado_por_usuario = request.modificado_por_usuario,
                 fecha_modificacion_utc = DateTime.UtcNow,
                 modificacion_ip = request.modificacion_ip,
                 servicio_origen = request.servicio_origen,
-
-                motivo_inhabilitacion = request.motivo_inhabilitacion,
-                fecha_inhabilitacion_utc = request.estado == "INA" ? DateTime.UtcNow : null
+                // motivo_inhabilitacion NO se incluye — lo gestiona el flujo de eliminación
             };
         }
 

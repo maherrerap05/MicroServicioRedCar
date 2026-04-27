@@ -75,17 +75,6 @@ namespace MicroServicio.RedCar.Business.Validators
             if (request.id_factura <= 0)
                 errors.Add("El id de la factura es inválido.");
 
-            if (string.IsNullOrWhiteSpace(request.numero_factura))
-                errors.Add("El número de factura es obligatorio.");
-
-            if (request.numero_factura != null && request.numero_factura.Trim().Length > 40)
-                errors.Add("El número de factura no puede exceder 40 caracteres.");
-
-            // id_cliente eliminado: se deriva automáticamente de la reserva
-
-            if (request.id_reserva <= 0)
-                errors.Add("La reserva es obligatoria.");
-
             if (!string.IsNullOrWhiteSpace(request.observaciones_factura) &&
                 request.observaciones_factura.Trim().Length > 300)
                 errors.Add("Las observaciones de la factura no pueden exceder 300 caracteres.");
@@ -93,15 +82,6 @@ namespace MicroServicio.RedCar.Business.Validators
             if (!string.IsNullOrWhiteSpace(request.origen_canal_factura) &&
                 request.origen_canal_factura.Trim().Length > 50)
                 errors.Add("El origen del canal de la factura no puede exceder 50 caracteres.");
-
-            if (string.IsNullOrWhiteSpace(request.estado))
-                errors.Add("El estado de la factura es obligatorio.");
-
-            if (!string.IsNullOrWhiteSpace(request.estado) &&
-                request.estado != "ABI" &&
-                request.estado != "APR" &&
-                request.estado != "INA")
-                errors.Add("El estado de la factura debe ser ABI, APR o INA.");
 
             if (string.IsNullOrWhiteSpace(request.modificado_por_usuario))
                 errors.Add("El usuario modificador es obligatorio.");
@@ -118,20 +98,6 @@ namespace MicroServicio.RedCar.Business.Validators
 
             if (request.servicio_origen != null && request.servicio_origen.Trim().Length > 50)
                 errors.Add("El servicio de origen no puede exceder 50 caracteres.");
-
-            if (request.estado == "INA")
-            {
-                if (string.IsNullOrWhiteSpace(request.motivo_inhabilitacion))
-                    errors.Add("El motivo de inhabilitación es obligatorio cuando el estado es INA.");
-
-                if (!string.IsNullOrWhiteSpace(request.motivo_inhabilitacion) &&
-                    request.motivo_inhabilitacion.Trim().Length > 250)
-                    errors.Add("El motivo de inhabilitación no puede exceder 250 caracteres.");
-            }
-
-            if ((request.estado == "ABI" || request.estado == "APR") &&
-                !string.IsNullOrWhiteSpace(request.motivo_inhabilitacion))
-                errors.Add("No debe enviarse motivo de inhabilitación cuando el estado no es INA.");
 
             return errors;
         }
