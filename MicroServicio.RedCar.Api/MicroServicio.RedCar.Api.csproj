@@ -20,8 +20,4 @@
     <ProjectReference Include="..\MicroServicio.RedCar.DataManagment\MicroServicio.RedCar.DataManagment.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\V1\Booking\" />
-  </ItemGroup>
-
 </Project>
