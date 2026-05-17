@@ -11,7 +11,7 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
             // =========================
             // TABLA
             // =========================
-            builder.ToTable("RES_X_XTRAS", "rental", tb =>
+            builder.ToTable("res_x_xtras", "rental", tb =>
             {
                 tb.HasCheckConstraint("CHK_RES_X_XTRAS_ESTADO", "estado_reserva_extra IN ('ACT', 'INA')");
                 tb.HasCheckConstraint("CHK_RES_X_XTRAS_ELIMINADO", "es_eliminado IN (0,1)");
@@ -19,24 +19,27 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
                 tb.HasCheckConstraint("CHK_RES_X_XTRAS_VALOR_UNITARIO", "valor_unitario_extra >= 0");
                 tb.HasCheckConstraint("CHK_RES_X_XTRAS_SUBTOTAL", "subtotal_extra >= 0");
 
-                // Nuevos constraints agregados
-                tb.HasCheckConstraint("CHK_RES_X_XTRAS_CREADO_POR_NO_VACIO", "LEN(LTRIM(RTRIM(creado_por_usuario))) > 0");
-                tb.HasCheckConstraint("CHK_RES_X_XTRAS_ORIGEN_REGISTRO_NO_VACIO", "LEN(LTRIM(RTRIM(origen_registro))) > 0");
+                // LEN(LTRIM(RTRIM(...))) → LENGTH(TRIM(...)) en PostgreSQL
+                tb.HasCheckConstraint("CHK_RES_X_XTRAS_CREADO_POR_NO_VACIO", "LENGTH(TRIM(creado_por_usuario)) > 0");
+                tb.HasCheckConstraint("CHK_RES_X_XTRAS_ORIGEN_REGISTRO_NO_VACIO", "LENGTH(TRIM(origen_registro)) > 0");
                 tb.HasCheckConstraint("CHK_RES_X_XTRAS_SUBTOTAL_COHERENTE", "subtotal_extra = (cantidad * valor_unitario_extra)");
 
                 tb.HasCheckConstraint(
                     "CHK_RES_X_XTRAS_INHABILITACION_FECHA_COHERENTE",
-                    "((es_eliminado = 1 AND fecha_inhabilitacion_utc IS NOT NULL) OR (es_eliminado = 0 AND fecha_inhabilitacion_utc IS NULL))"
+                    "((es_eliminado = true AND fecha_inhabilitacion_utc IS NOT NULL) OR (es_eliminado = false AND fecha_inhabilitacion_utc IS NULL))"
+                // es_eliminado = 1/0 → true/false
                 );
 
                 tb.HasCheckConstraint(
                     "CHK_RES_X_XTRAS_INHABILITACION_MOTIVO_COHERENTE",
-                    "((es_eliminado = 1 AND motivo_inhabilitacion IS NOT NULL AND LEN(LTRIM(RTRIM(motivo_inhabilitacion))) > 0) OR (es_eliminado = 0 AND motivo_inhabilitacion IS NULL))"
+                    "((es_eliminado = true AND motivo_inhabilitacion IS NOT NULL AND LENGTH(TRIM(motivo_inhabilitacion)) > 0) OR (es_eliminado = false AND motivo_inhabilitacion IS NULL))"
+                // LEN(LTRIM(RTRIM(...))) → LENGTH(TRIM(...)), 1/0 → true/false
                 );
 
                 tb.HasCheckConstraint(
                     "CHK_RES_X_XTRAS_MODIFICACION_USUARIO_COHERENTE",
-                    "((fecha_modificacion_utc IS NULL AND modificado_por_usuario IS NULL) OR (fecha_modificacion_utc IS NOT NULL AND modificado_por_usuario IS NOT NULL AND LEN(LTRIM(RTRIM(modificado_por_usuario))) > 0))"
+                    "((fecha_modificacion_utc IS NULL AND modificado_por_usuario IS NULL) OR (fecha_modificacion_utc IS NOT NULL AND modificado_por_usuario IS NOT NULL AND LENGTH(TRIM(modificado_por_usuario)) > 0))"
+                // LEN(LTRIM(RTRIM(...))) → LENGTH(TRIM(...))
                 );
             });
 
@@ -54,7 +57,7 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
             // =========================
             builder.Property(rx => rx.reserva_extra_guid)
                    .IsRequired()
-                   .HasDefaultValueSql("NEWID()");
+                   .ValueGeneratedNever(); // NEWID() → gen_random_uuid()
 
             builder.Property(rx => rx.id_reserva)
                    .IsRequired();
@@ -68,11 +71,11 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
 
             builder.Property(rx => rx.valor_unitario_extra)
                    .IsRequired()
-                   .HasColumnType("decimal(10,2)");
+                   .HasColumnType("numeric(10,2)"); // decimal(10,2) → numeric(10,2)
 
             builder.Property(rx => rx.subtotal_extra)
                    .IsRequired()
-                   .HasColumnType("decimal(10,2)");
+                   .HasColumnType("numeric(10,2)"); // decimal(10,2) → numeric(10,2)
 
             // =========================
             // ESTADO / CICLO DE VIDA
@@ -81,55 +84,49 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
                    .IsRequired()
                    .HasMaxLength(3)
                    .IsFixedLength()
-                   .IsUnicode(false)
                    .HasDefaultValue("ACT");
+            // IsUnicode(false) eliminado
 
             builder.Property(rx => rx.es_eliminado)
                    .IsRequired()
                    .HasDefaultValue(false);
 
             builder.Property(rx => rx.fecha_inhabilitacion_utc)
-                   .HasColumnType("datetime2(0)");
+                   .HasColumnType("timestamptz"); // datetime2(0) → timestamptz
 
             builder.Property(rx => rx.motivo_inhabilitacion)
-                   .HasMaxLength(200)
-                   .IsUnicode(false);
+                   .HasMaxLength(200);
+            // IsUnicode(false) eliminado
 
             // =========================
             // AUDITORÍA
             // =========================
             builder.Property(rx => rx.fecha_registro_utc)
                    .IsRequired()
-                   .HasColumnType("datetime2(0)")
-                   .HasDefaultValueSql("SYSUTCDATETIME()");
+                   .HasColumnType("timestamptz") // datetime2(0) → timestamptz
+                   .HasDefaultValueSql("NOW()"); // SYSUTCDATETIME() → NOW()
 
             builder.Property(rx => rx.creado_por_usuario)
                    .IsRequired()
-                   .HasMaxLength(100)
-                   .IsUnicode(false);
+                   .HasMaxLength(100);
+            // IsUnicode(false) eliminado
 
             builder.Property(rx => rx.modificado_por_usuario)
-                   .HasMaxLength(100)
-                   .IsUnicode(false);
+                   .HasMaxLength(100);
+            // IsUnicode(false) eliminado
 
             builder.Property(rx => rx.fecha_modificacion_utc)
-                   .HasColumnType("datetime2(0)");
+                   .HasColumnType("timestamptz"); // datetime2(0) → timestamptz
 
             builder.Property(rx => rx.modificado_desde_ip)
-                   .HasMaxLength(45)
-                   .IsUnicode(false);
+                   .HasMaxLength(45);
+            // IsUnicode(false) eliminado
 
-            // =========================
-            // CONCURRENCIA / INTEGRACIÓN
-            // =========================
-            builder.Property(rx => rx.row_version)
-                   .IsRowVersion()
-                   .IsConcurrencyToken();
 
             builder.Property(rx => rx.origen_registro)
                    .IsRequired()
-                   .HasMaxLength(20)
-                   .IsUnicode(false);
+                   .HasMaxLength(20);
+            // IsUnicode(false) eliminado
 
             // =========================
             // ÍNDICES / UNIQUE

@@ -42,7 +42,7 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
                 modificacion_ip = entity.modificacion_ip,
 
                 servicio_origen = entity.servicio_origen,
-                row_version = entity.row_version
+                
             };
         }
 
@@ -55,7 +55,7 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
             {
                 id_factura = model.id_factura,
 
-                guid_factura = model.guid_factura,
+                guid_factura = model.guid_factura == Guid.Empty ? Guid.NewGuid() : model.guid_factura,
                 numero_factura = model.numero_factura,
 
                 id_cliente = model.id_cliente,
@@ -83,7 +83,7 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
                 modificacion_ip = model.modificacion_ip,
 
                 servicio_origen = model.servicio_origen,
-                row_version = model.row_version
+                
             };
         }
     }

@@ -62,7 +62,7 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
                 modificacion_ip = entity.modificacion_ip,
 
                 servicio_origen = entity.servicio_origen,
-                row_version = entity.row_version
+                
             };
         }
 
@@ -75,7 +75,7 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
             {
                 id_reserva = model.id_reserva,
 
-                guid_reserva = model.guid_reserva,
+                guid_reserva = model.guid_reserva == Guid.Empty ? Guid.NewGuid() : model.guid_reserva,
                 codigo_reserva = model.codigo_reserva,
 
                 id_cliente = model.id_cliente,
@@ -123,7 +123,7 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
                 modificacion_ip = model.modificacion_ip,
 
                 servicio_origen = model.servicio_origen,
-                row_version = model.row_version
+                
             };
         }
     }

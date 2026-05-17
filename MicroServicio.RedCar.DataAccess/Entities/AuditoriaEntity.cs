@@ -16,7 +16,7 @@ namespace MicroServicio.RedCar.DataAccess.Entities
         // =========================
         // IDENTIFICACIÓN DEL EVENTO
         // =========================
-        public Guid auditoria_guid { get; set; }
+        public Guid auditoria_guid { get; set; } = Guid.NewGuid();
 
         public string tabla_afectada { get; set; } = null!;
         public string operacion { get; set; } = null!; // INSERT, UPDATE, DELETE
@@ -45,6 +45,6 @@ namespace MicroServicio.RedCar.DataAccess.Entities
         // =========================
         // CONCURRENCIA
         // =========================
-        public byte[] row_version { get; set; } = null!;
+        
     }
 }

@@ -12,7 +12,7 @@ namespace MicroServicio.RedCar.DataAccess.Entities
         // =========================
         // IDENTIFICACIÓN TÉCNICA
         // =========================
-        public Guid cliente_guid { get; set; }
+        public Guid cliente_guid { get; set; } = Guid.NewGuid();
 
         // =========================
         // IDENTIFICACIÓN DEL CLIENTE
@@ -64,6 +64,6 @@ namespace MicroServicio.RedCar.DataAccess.Entities
         // =========================
         // CONCURRENCIA
         // =========================
-        public byte[] row_version { get; set; } = null!;
+        
     }
 }

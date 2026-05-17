@@ -30,7 +30,7 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
 
                 activo = entity.activo,
 
-                row_version = entity.row_version
+                
             };
         }
 
@@ -42,7 +42,7 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
             return new AuditoriaEntity
             {
                 id_auditoria = model.id_auditoria,
-                auditoria_guid = model.auditoria_guid,
+                auditoria_guid = model.auditoria_guid == Guid.Empty ? Guid.NewGuid() : model.auditoria_guid,
 
                 tabla_afectada = model.tabla_afectada,
                 operacion = model.operacion,
@@ -59,7 +59,7 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
 
                 activo = model.activo,
 
-                row_version = model.row_version
+                
             };
         }
     }

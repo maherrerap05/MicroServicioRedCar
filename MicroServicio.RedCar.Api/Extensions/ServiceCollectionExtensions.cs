@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
 using MicroServicio.RedCar.Business.Interfaces;
 using MicroServicio.RedCar.Business.Services;
 using MicroServicio.RedCar.DataAccess.Context;
@@ -12,7 +13,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<RedCarDBContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("RedCarDb")));
+            options.UseNpgsql(configuration.GetConnectionString("RedCarDb")));
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 

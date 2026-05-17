@@ -12,7 +12,7 @@ namespace MicroServicio.RedCar.DataAccess.Entities
         // =========================
         // CAMPOS PRINCIPALES
         // =========================
-        public Guid categoria_vehiculo_guid { get; set; }
+        public Guid categoria_vehiculo_guid { get; set; } = Guid.NewGuid(); // Guid generado en C#
 
         public string codigo_categoria_vehiculo { get; set; } = null!;
         public string nombre_categoria_vehiculo { get; set; } = null!;
@@ -40,7 +40,7 @@ namespace MicroServicio.RedCar.DataAccess.Entities
         // =========================
         // CONCURRENCIA
         // =========================
-        public byte[] row_version { get; set; } = null!;
+        
 
         // =========================
         // INTEGRACIÓN / ORIGEN

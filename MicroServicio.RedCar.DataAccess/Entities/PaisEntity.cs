@@ -12,7 +12,7 @@ namespace MicroServicio.RedCar.DataAccess.Entities
         // =========================
         // IDENTIFICACIÓN TÉCNICA
         // =========================
-        public Guid pais_guid { get; set; }
+        public Guid pais_guid { get; set; } = Guid.NewGuid();
 
         // =========================
         // CAMPOS PRINCIPALES
@@ -40,7 +40,7 @@ namespace MicroServicio.RedCar.DataAccess.Entities
         // =========================
         // CONCURRENCIA
         // =========================
-        public byte[] row_version { get; set; } = null!;
+        
 
         // =========================
         // INTEGRACIÓN / ORIGEN

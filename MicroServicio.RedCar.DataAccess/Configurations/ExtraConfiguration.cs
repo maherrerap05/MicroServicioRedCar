@@ -11,7 +11,7 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
             // =========================
             // TABLA
             // =========================
-            builder.ToTable("EXTRAS", "rental", tb =>
+            builder.ToTable("extras", "rental", tb =>
             {
                 tb.HasCheckConstraint("CHK_EXTRAS_ESTADO", "estado_extra IN ('ACT', 'INA')");
                 tb.HasCheckConstraint("CHK_EXTRAS_ELIMINADO", "es_eliminado IN (0,1)");
@@ -32,26 +32,26 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
             // =========================
             builder.Property(e => e.extra_guid)
                    .IsRequired()
-                   .HasDefaultValueSql("NEWID()");
+                   .ValueGeneratedNever(); // NEWID() → gen_random_uuid()
 
             builder.Property(e => e.codigo_extra)
                    .IsRequired()
-                   .HasMaxLength(20)
-                   .IsUnicode(false);
+                   .HasMaxLength(20);
+            // IsUnicode(false) eliminado
 
             builder.Property(e => e.nombre_extra)
                    .IsRequired()
-                   .HasMaxLength(100)
-                   .IsUnicode(false);
+                   .HasMaxLength(100);
+            // IsUnicode(false) eliminado
 
             builder.Property(e => e.descripcion_extra)
                    .IsRequired()
-                   .HasMaxLength(250)
-                   .IsUnicode(false);
+                   .HasMaxLength(250);
+            // IsUnicode(false) eliminado
 
             builder.Property(e => e.valor_fijo)
                    .IsRequired()
-                   .HasColumnType("decimal(10,2)");
+                   .HasColumnType("numeric(10,2)"); // decimal(10,2) → numeric(10,2)
 
             // =========================
             // ESTADO / CICLO DE VIDA
@@ -60,8 +60,8 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
                    .IsRequired()
                    .HasMaxLength(3)
                    .IsFixedLength()
-                   .IsUnicode(false)
                    .HasDefaultValue("ACT");
+            // IsUnicode(false) eliminado
 
             builder.Property(e => e.es_eliminado)
                    .IsRequired()
@@ -72,46 +72,40 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
             // =========================
             builder.Property(e => e.fecha_registro_utc)
                    .IsRequired()
-                   .HasColumnType("datetime2(0)")
-                   .HasDefaultValueSql("SYSUTCDATETIME()");
+                   .HasColumnType("timestamptz") // datetime2(0) → timestamptz
+                   .HasDefaultValueSql("NOW()"); // SYSUTCDATETIME() → NOW()
 
             builder.Property(e => e.creado_por_usuario)
                    .IsRequired()
-                   .HasMaxLength(100)
-                   .IsUnicode(false);
+                   .HasMaxLength(100);
+            // IsUnicode(false) eliminado
 
             builder.Property(e => e.modificado_por_usuario)
-                   .HasMaxLength(100)
-                   .IsUnicode(false);
+                   .HasMaxLength(100);
+            // IsUnicode(false) eliminado
 
             builder.Property(e => e.fecha_modificacion_utc)
-                   .HasColumnType("datetime2(0)");
+                   .HasColumnType("timestamptz"); // datetime2(0) → timestamptz
 
             builder.Property(e => e.modificado_desde_ip)
-                   .HasMaxLength(45)
-                   .IsUnicode(false);
+                   .HasMaxLength(45);
+            // IsUnicode(false) eliminado
 
             builder.Property(e => e.fecha_inhabilitacion_utc)
-                   .HasColumnType("datetime2(0)");
+                   .HasColumnType("timestamptz"); // datetime2(0) → timestamptz
 
             builder.Property(e => e.motivo_inhabilitacion)
-                   .HasMaxLength(200)
-                   .IsUnicode(false);
+                   .HasMaxLength(200);
+            // IsUnicode(false) eliminado
 
-            // =========================
-            // CONCURRENCIA
-            // =========================
-            builder.Property(e => e.row_version)
-                   .IsRowVersion()
-                   .IsConcurrencyToken();
 
             // =========================
             // INTEGRACIÓN / ORIGEN
             // =========================
             builder.Property(e => e.origen_registro)
                    .IsRequired()
-                   .HasMaxLength(20)
-                   .IsUnicode(false);
+                   .HasMaxLength(20);
+            // IsUnicode(false) eliminado
 
             // =========================
             // ÍNDICES / UNIQUE

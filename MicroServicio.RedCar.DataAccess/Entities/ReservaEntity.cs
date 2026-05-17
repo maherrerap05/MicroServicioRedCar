@@ -12,7 +12,7 @@ namespace MicroServicio.RedCar.DataAccess.Entities
         // =========================
         // IDENTIFICACIÓN TÉCNICA
         // =========================
-        public Guid guid_reserva { get; set; }
+        public Guid guid_reserva { get; set; } = Guid.NewGuid();
 
         public string codigo_reserva { get; set; } = null!;
 
@@ -86,6 +86,6 @@ namespace MicroServicio.RedCar.DataAccess.Entities
         // =========================
         // CONCURRENCIA
         // =========================
-        public byte[] row_version { get; set; } = null!;
+        
     }
 }

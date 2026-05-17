@@ -11,7 +11,7 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
             // =========================
             // TABLA
             // =========================
-            builder.ToTable("ROL", "rental", tb =>
+            builder.ToTable("rol", "rental", tb =>
             {
                 tb.HasCheckConstraint("CHK_ROLES_ESTADO", "estado_rol IN ('ACT', 'INA')");
                 tb.HasCheckConstraint("CHK_ROLES_ELIMINADO", "es_eliminado IN (0,1)");
@@ -32,16 +32,16 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
             // =========================
             builder.Property(r => r.rol_guid)
                    .IsRequired()
-                   .HasDefaultValueSql("NEWID()");
+                   .ValueGeneratedNever(); // NEWID() → gen_random_uuid()
 
             builder.Property(r => r.nombre_rol)
                    .IsRequired()
-                   .HasMaxLength(50)
-                   .IsUnicode(false);
+                   .HasMaxLength(50);
+            // IsUnicode(false) eliminado
 
             builder.Property(r => r.descripcion_rol)
-                   .HasMaxLength(200)
-                   .IsUnicode(false);
+                   .HasMaxLength(200);
+            // IsUnicode(false) eliminado
 
             // =========================
             // ESTADO
@@ -50,8 +50,8 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
                    .IsRequired()
                    .HasMaxLength(3)
                    .IsFixedLength()
-                   .IsUnicode(false)
                    .HasDefaultValue("ACT");
+            // IsUnicode(false) eliminado
 
             builder.Property(r => r.es_eliminado)
                    .IsRequired()
@@ -66,27 +66,21 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
             // =========================
             builder.Property(r => r.fecha_registro_utc)
                    .IsRequired()
-                   .HasColumnType("datetime2(0)")
-                   .HasDefaultValueSql("SYSUTCDATETIME()");
+                   .HasColumnType("timestamptz") // datetime2(0) → timestamptz
+                   .HasDefaultValueSql("NOW()"); // SYSUTCDATETIME() → NOW()
 
             builder.Property(r => r.creado_por_usuario)
                    .IsRequired()
-                   .HasMaxLength(100)
-                   .IsUnicode(false);
+                   .HasMaxLength(100);
+            // IsUnicode(false) eliminado
 
             builder.Property(r => r.modificado_por_usuario)
-                   .HasMaxLength(100)
-                   .IsUnicode(false);
+                   .HasMaxLength(100);
+            // IsUnicode(false) eliminado
 
             builder.Property(r => r.fecha_modificacion_utc)
-                   .HasColumnType("datetime2(0)");
+                   .HasColumnType("timestamptz"); // datetime2(0) → timestamptz
 
-            // =========================
-            // CONCURRENCIA
-            // =========================
-            builder.Property(r => r.row_version)
-                   .IsRowVersion()
-                   .IsConcurrencyToken();
 
             // =========================
             // ÍNDICES ÚNICOS

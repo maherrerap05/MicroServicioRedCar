@@ -6,7 +6,7 @@ namespace MicroServicio.RedCar.DataAccess.Entities
     public class UsuarioAppEntity
     {
         public int id_usuario { get; set; }
-        public Guid usuario_guid { get; set; }
+        public Guid usuario_guid { get; set; } = Guid.NewGuid();
 
         public string username { get; set; } = null!;
         public string correo { get; set; } = null!;
@@ -24,7 +24,7 @@ namespace MicroServicio.RedCar.DataAccess.Entities
         public string? modificado_por_usuario { get; set; }
         public DateTime? fecha_modificacion_utc { get; set; }
 
-        public byte[] row_version { get; set; } = null!;
+        
 
         public int id_cliente { get; set; }
 

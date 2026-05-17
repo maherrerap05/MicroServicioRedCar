@@ -19,7 +19,7 @@ namespace MicroServicio.RedCar.DataAccess.Entities
         public string? modificado_por_usuario { get; set; }
         public DateTime? fecha_modificacion_utc { get; set; }
 
-        public byte[] row_version { get; set; } = null!;
+        
 
         // RELACIONES
         public UsuarioAppEntity Usuario { get; set; } = null!;

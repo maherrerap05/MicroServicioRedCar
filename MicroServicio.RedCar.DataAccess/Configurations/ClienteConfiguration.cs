@@ -11,7 +11,7 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
             // =========================
             // TABLA
             // =========================
-            builder.ToTable("CLIENTES", "rental", tb =>
+            builder.ToTable("clientes", "rental", tb =>
             {
                 tb.HasCheckConstraint("CHK_CLIENTES_ESTADO", "estado IN ('ACT', 'INA')");
                 tb.HasCheckConstraint("CHK_CLIENTES_ES_ELIMINADO", "es_eliminado IN (0,1)");
@@ -31,54 +31,54 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
             // =========================
             builder.Property(c => c.cliente_guid)
                    .IsRequired()
-                   .HasDefaultValueSql("NEWID()");
+                   .ValueGeneratedNever(); // NEWID() → gen_random_uuid()
 
             // =========================
             // IDENTIFICACIÓN DEL CLIENTE
             // =========================
             builder.Property(c => c.tipo_identificacion)
                    .IsRequired()
-                   .HasMaxLength(20)
-                   .IsUnicode(false);
+                   .HasMaxLength(20);
+            // IsUnicode(false) eliminado
 
             builder.Property(c => c.numero_identificacion)
                    .IsRequired()
-                   .HasMaxLength(30)
-                   .IsUnicode(false);
+                   .HasMaxLength(30);
+            // IsUnicode(false) eliminado
 
             // =========================
             // DATOS PERSONALES / FISCALES
             // =========================
             builder.Property(c => c.nombres)
                    .IsRequired()
-                   .HasMaxLength(160)
-                   .IsUnicode(false);
+                   .HasMaxLength(160);
+            // IsUnicode(false) eliminado
 
             builder.Property(c => c.apellidos)
-                   .HasMaxLength(160)
-                   .IsUnicode(false);
+                   .HasMaxLength(160);
+            // IsUnicode(false) eliminado
 
             builder.Property(c => c.razon_social)
-                   .HasMaxLength(200)
-                   .IsUnicode(false);
+                   .HasMaxLength(200);
+            // IsUnicode(false) eliminado
 
             // =========================
             // DATOS DE CONTACTO
             // =========================
             builder.Property(c => c.correo)
                    .IsRequired()
-                   .HasMaxLength(150)
-                   .IsUnicode(false);
+                   .HasMaxLength(150);
+            // IsUnicode(false) eliminado
 
             builder.Property(c => c.telefono)
                    .IsRequired()
-                   .HasMaxLength(30)
-                   .IsUnicode(false);
+                   .HasMaxLength(30);
+            // IsUnicode(false) eliminado
 
             builder.Property(c => c.direccion)
                    .IsRequired()
-                   .HasMaxLength(250)
-                   .IsUnicode(false);
+                   .HasMaxLength(250);
+            // IsUnicode(false) eliminado
 
             // =========================
             // ESTADO / CICLO DE VIDA
@@ -87,8 +87,8 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
                    .IsRequired()
                    .HasMaxLength(3)
                    .IsFixedLength()
-                   .IsUnicode(false)
                    .HasDefaultValue("ACT");
+            // IsUnicode(false) eliminado
 
             builder.Property(c => c.es_eliminado)
                    .IsRequired()
@@ -99,49 +99,43 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
             // =========================
             builder.Property(c => c.creado_por_usuario)
                    .IsRequired()
-                   .HasMaxLength(100)
-                   .IsUnicode(false);
+                   .HasMaxLength(100);
+            // IsUnicode(false) eliminado
 
             builder.Property(c => c.fecha_registro_utc)
                    .IsRequired()
-                   .HasColumnType("datetime2(0)")
-                   .HasDefaultValueSql("SYSUTCDATETIME()");
+                   .HasColumnType("timestamptz") // datetime2(0) → timestamptz
+                   .HasDefaultValueSql("NOW()"); // SYSUTCDATETIME() → NOW()
 
             builder.Property(c => c.modificado_por_usuario)
-                   .HasMaxLength(100)
-                   .IsUnicode(false);
+                   .HasMaxLength(100);
+            // IsUnicode(false) eliminado
 
             builder.Property(c => c.fecha_modificacion_utc)
-                   .HasColumnType("datetime2(0)");
+                   .HasColumnType("timestamptz"); // datetime2(0) → timestamptz
 
             builder.Property(c => c.modificacion_ip)
-                   .HasMaxLength(45)
-                   .IsUnicode(false);
+                   .HasMaxLength(45);
+            // IsUnicode(false) eliminado
 
             // =========================
             // INTEGRACIÓN / ORIGEN
             // =========================
             builder.Property(c => c.servicio_origen)
                    .IsRequired()
-                   .HasMaxLength(50)
-                   .IsUnicode(false);
+                   .HasMaxLength(50);
+            // IsUnicode(false) eliminado
 
             // =========================
             // CAMPOS OPCIONALES EXTENDIDOS
             // =========================
             builder.Property(c => c.fecha_inhabilitacion_utc)
-                   .HasColumnType("datetime2(0)");
+                   .HasColumnType("timestamptz"); // datetime2(0) → timestamptz
 
             builder.Property(c => c.motivo_inhabilitacion)
-                   .HasMaxLength(250)
-                   .IsUnicode(false);
+                   .HasMaxLength(250);
+            // IsUnicode(false) eliminado
 
-            // =========================
-            // CONCURRENCIA
-            // =========================
-            builder.Property(c => c.row_version)
-                   .IsRowVersion()
-                   .IsConcurrencyToken();
 
             // =========================
             // ÍNDICES / UNIQUE

@@ -11,7 +11,7 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
             // =========================
             // TABLA
             // =========================
-            builder.ToTable("USUARIOS_ROLES", "rental", tb =>
+            builder.ToTable("usuarios_roles", "rental", tb =>
             {
                 tb.HasCheckConstraint("CHK_USUARIOS_ROLES_ESTADO", "estado_usuario_rol IN ('ACT', 'INA')");
                 tb.HasCheckConstraint("CHK_USUARIOS_ROLES_ELIMINADO", "es_eliminado IN (0,1)");
@@ -43,8 +43,8 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
                    .IsRequired()
                    .HasMaxLength(3)
                    .IsFixedLength()
-                   .IsUnicode(false)
                    .HasDefaultValue("ACT");
+            // IsUnicode(false) eliminado
 
             builder.Property(ur => ur.es_eliminado)
                    .IsRequired()
@@ -59,27 +59,21 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
             // =========================
             builder.Property(ur => ur.fecha_registro_utc)
                    .IsRequired()
-                   .HasColumnType("datetime2(0)")
-                   .HasDefaultValueSql("SYSUTCDATETIME()");
+                   .HasColumnType("timestamptz") // datetime2(0) → timestamptz
+                   .HasDefaultValueSql("NOW()"); // SYSUTCDATETIME() → NOW()
 
             builder.Property(ur => ur.creado_por_usuario)
                    .IsRequired()
-                   .HasMaxLength(100)
-                   .IsUnicode(false);
+                   .HasMaxLength(100);
+            // IsUnicode(false) eliminado
 
             builder.Property(ur => ur.modificado_por_usuario)
-                   .HasMaxLength(100)
-                   .IsUnicode(false);
+                   .HasMaxLength(100);
+            // IsUnicode(false) eliminado
 
             builder.Property(ur => ur.fecha_modificacion_utc)
-                   .HasColumnType("datetime2(0)");
+                   .HasColumnType("timestamptz"); // datetime2(0) → timestamptz
 
-            // =========================
-            // CONCURRENCIA
-            // =========================
-            builder.Property(ur => ur.row_version)
-                   .IsRowVersion()
-                   .IsConcurrencyToken();
 
             // =========================
             // ÍNDICE ÚNICO COMPUESTO

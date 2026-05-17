@@ -11,7 +11,7 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
             // =========================
             // TABLA
             // =========================
-            builder.ToTable("AUDITORIA", "rental", tb =>
+            builder.ToTable("auditoria", "rental", tb =>
             {
                 tb.HasCheckConstraint("CHK_AUDITORIA_OPERACION", "operacion IN ('INSERT', 'UPDATE', 'DELETE')");
                 tb.HasCheckConstraint("CHK_AUDITORIA_ACTIVO", "activo IN (0,1)");
@@ -31,48 +31,46 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
             // =========================
             builder.Property(a => a.auditoria_guid)
                    .IsRequired()
-                   .HasDefaultValueSql("NEWID()");
+                   .ValueGeneratedNever(); 
 
             builder.Property(a => a.tabla_afectada)
                    .IsRequired()
-                   .HasMaxLength(100)
-                   .IsUnicode(false);
+                   .HasMaxLength(100);
+            
 
             builder.Property(a => a.operacion)
                    .IsRequired()
-                   .HasMaxLength(10)
-                   .IsUnicode(false);
+                   .HasMaxLength(10);
+           
 
             builder.Property(a => a.id_registro_afectado)
-                   .HasMaxLength(100)
-                   .IsUnicode(false);
+                   .HasMaxLength(100);
+           
 
             // =========================
             // DATOS DEL CAMBIO
             // =========================
             builder.Property(a => a.datos_anteriores)
-                   .HasColumnType("varchar(max)")
-                   .IsUnicode(false);
+                   .HasColumnType("text"); 
 
             builder.Property(a => a.datos_nuevos)
-                   .HasColumnType("varchar(max)")
-                   .IsUnicode(false);
+                   .HasColumnType("text"); 
 
             // =========================
             // CONTEXTO DEL EVENTO
             // =========================
             builder.Property(a => a.usuario_ejecutor)
-                   .HasMaxLength(100)
-                   .IsUnicode(false);
+                   .HasMaxLength(100);
+            
 
             builder.Property(a => a.ip_origen)
-                   .HasMaxLength(45)
-                   .IsUnicode(false);
+                   .HasMaxLength(45);
+            
 
             builder.Property(a => a.fecha_evento_utc)
                    .IsRequired()
-                   .HasColumnType("datetime2(0)")
-                   .HasDefaultValueSql("SYSUTCDATETIME()");
+                   .HasColumnType("timestamptz") 
+                   .HasDefaultValueSql("NOW()"); 
 
             // =========================
             // ESTADO
@@ -81,12 +79,6 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
                    .IsRequired()
                    .HasDefaultValue(true);
 
-            // =========================
-            // CONCURRENCIA
-            // =========================
-            builder.Property(a => a.row_version)
-                   .IsRowVersion()
-                   .IsConcurrencyToken();
 
             // =========================
             // ÍNDICES ÚNICOS

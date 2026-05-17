@@ -56,7 +56,7 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
                 fecha_inhabilitacion_utc = entity.fecha_inhabilitacion_utc,
                 motivo_inhabilitacion = entity.motivo_inhabilitacion,
 
-                row_version = entity.row_version
+                
             };
         }
 
@@ -68,7 +68,7 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
             return new VehiculoEntity
             {
                 id_vehiculo = model.id_vehiculo,
-                vehiculo_guid = model.vehiculo_guid,
+                vehiculo_guid = model.vehiculo_guid == Guid.Empty ? Guid.NewGuid() : model.vehiculo_guid,
 
                 codigo_interno_vehiculo = model.codigo_interno_vehiculo,
                 placa_vehiculo = model.placa_vehiculo,
@@ -111,7 +111,7 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
                 fecha_inhabilitacion_utc = model.fecha_inhabilitacion_utc,
                 motivo_inhabilitacion = model.motivo_inhabilitacion,
 
-                row_version = model.row_version
+                
             };
         }
     }

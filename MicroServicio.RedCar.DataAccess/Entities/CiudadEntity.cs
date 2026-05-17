@@ -17,7 +17,7 @@ namespace MicroServicio.RedCar.DataAccess.Entities
         // =========================
         // CAMPOS PRINCIPALES
         // =========================
-        public Guid ciudad_guid { get; set; }
+        public Guid ciudad_guid { get; set; } = Guid.NewGuid();
 
         public string nombre_ciudad { get; set; } = null!;
 
@@ -43,7 +43,7 @@ namespace MicroServicio.RedCar.DataAccess.Entities
         // =========================
         // CONCURRENCIA
         // =========================
-        public byte[] row_version { get; set; } = null!;
+        
 
         // =========================
         // INTEGRACIÓN / ORIGEN

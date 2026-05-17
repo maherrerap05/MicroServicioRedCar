@@ -28,7 +28,7 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
                 modificado_por_usuario = entity.modificado_por_usuario,
                 fecha_modificacion_utc = entity.fecha_modificacion_utc,
 
-                row_version = entity.row_version
+                
             };
         }
 
@@ -40,7 +40,7 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
             return new RolEntity
             {
                 id_rol = model.id_rol,
-                rol_guid = model.rol_guid,
+                rol_guid = model.rol_guid == Guid.Empty ? Guid.NewGuid() : model.rol_guid,
 
                 nombre_rol = model.nombre_rol,
                 descripcion_rol = model.descripcion_rol,
@@ -55,7 +55,7 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
                 modificado_por_usuario = model.modificado_por_usuario,
                 fecha_modificacion_utc = model.fecha_modificacion_utc,
 
-                row_version = model.row_version
+                
             };
         }
     }

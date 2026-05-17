@@ -33,7 +33,7 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
                 modificado_por_usuario = entity.modificado_por_usuario,
                 fecha_modificacion_utc = entity.fecha_modificacion_utc,
 
-                row_version = entity.row_version
+                
             };
         }
 
@@ -45,7 +45,7 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
             return new UsuarioAppEntity
             {
                 id_usuario = model.id_usuario,
-                usuario_guid = model.usuario_guid,
+                usuario_guid = model.usuario_guid == Guid.Empty ? Guid.NewGuid() : model.usuario_guid,
 
                 username = model.username,
                 correo = model.correo,
@@ -65,7 +65,7 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
                 modificado_por_usuario = model.modificado_por_usuario,
                 fecha_modificacion_utc = model.fecha_modificacion_utc,
 
-                row_version = model.row_version
+                
             };
         }
     }

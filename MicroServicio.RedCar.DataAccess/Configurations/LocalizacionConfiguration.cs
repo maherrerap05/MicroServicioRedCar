@@ -11,7 +11,7 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
             // =========================
             // TABLA
             // =========================
-            builder.ToTable("LOCALIZACIONES", "rental", tb =>
+            builder.ToTable("localizaciones", "rental", tb =>
             {
                 tb.HasCheckConstraint("CHK_LOCALIZACIONES_ESTADO", "estado_localizacion IN ('ACT', 'INA')");
                 tb.HasCheckConstraint("CHK_LOCALIZACIONES_ELIMINADO", "es_eliminado IN (0,1)");
@@ -31,42 +31,42 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
             // =========================
             builder.Property(l => l.localizacion_guid)
                    .IsRequired()
-                   .HasDefaultValueSql("NEWID()");
+                   .ValueGeneratedNever(); // NEWID() → gen_random_uuid()
 
             builder.Property(l => l.codigo_localizacion)
                    .IsRequired()
-                   .HasMaxLength(20)
-                   .IsUnicode(false);
+                   .HasMaxLength(20);
+            // IsUnicode(false) eliminado
 
             builder.Property(l => l.nombre_localizacion)
                    .IsRequired()
-                   .HasMaxLength(100)
-                   .IsUnicode(false);
+                   .HasMaxLength(100);
+            // IsUnicode(false) eliminado
 
             builder.Property(l => l.direccion_localizacion)
                    .IsRequired()
-                   .HasMaxLength(200)
-                   .IsUnicode(false);
+                   .HasMaxLength(200);
+            // IsUnicode(false) eliminado
 
             builder.Property(l => l.telefono_contacto)
                    .IsRequired()
-                   .HasMaxLength(20)
-                   .IsUnicode(false);
+                   .HasMaxLength(20);
+            // IsUnicode(false) eliminado
 
             builder.Property(l => l.correo_contacto)
                    .IsRequired()
-                   .HasMaxLength(120)
-                   .IsUnicode(false);
+                   .HasMaxLength(120);
+            // IsUnicode(false) eliminado
 
             builder.Property(l => l.horario_atencion)
                    .IsRequired()
-                   .HasMaxLength(120)
-                   .IsUnicode(false);
+                   .HasMaxLength(120);
+            // IsUnicode(false) eliminado
 
             builder.Property(l => l.zona_horaria)
                    .IsRequired()
-                   .HasMaxLength(50)
-                   .IsUnicode(false);
+                   .HasMaxLength(50);
+            // IsUnicode(false) eliminado
 
             // =========================
             // CLAVE FORÁNEA
@@ -81,8 +81,8 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
                    .IsRequired()
                    .HasMaxLength(3)
                    .IsFixedLength()
-                   .IsUnicode(false)
                    .HasDefaultValue("ACT");
+            // IsUnicode(false) eliminado
 
             builder.Property(l => l.es_eliminado)
                    .IsRequired()
@@ -93,46 +93,40 @@ namespace MicroServicio.RedCar.DataAccess.Configurations
             // =========================
             builder.Property(l => l.fecha_registro_utc)
                    .IsRequired()
-                   .HasColumnType("datetime2(0)")
-                   .HasDefaultValueSql("SYSUTCDATETIME()");
+                   .HasColumnType("timestamptz") // datetime2(0) → timestamptz
+                   .HasDefaultValueSql("NOW()"); // SYSUTCDATETIME() → NOW()
 
             builder.Property(l => l.creado_por_usuario)
                    .IsRequired()
-                   .HasMaxLength(100)
-                   .IsUnicode(false);
+                   .HasMaxLength(100);
+            // IsUnicode(false) eliminado
 
             builder.Property(l => l.modificado_por_usuario)
-                   .HasMaxLength(100)
-                   .IsUnicode(false);
+                   .HasMaxLength(100);
+            // IsUnicode(false) eliminado
 
             builder.Property(l => l.fecha_modificacion_utc)
-                   .HasColumnType("datetime2(0)");
+                   .HasColumnType("timestamptz"); // datetime2(0) → timestamptz
 
             builder.Property(l => l.modificado_desde_ip)
-                   .HasMaxLength(45)
-                   .IsUnicode(false);
+                   .HasMaxLength(45);
+            // IsUnicode(false) eliminado
 
             builder.Property(l => l.fecha_inhabilitacion_utc)
-                   .HasColumnType("datetime2(0)");
+                   .HasColumnType("timestamptz"); // datetime2(0) → timestamptz
 
             builder.Property(l => l.motivo_inhabilitacion)
-                   .HasMaxLength(200)
-                   .IsUnicode(false);
+                   .HasMaxLength(200);
+            // IsUnicode(false) eliminado
 
-            // =========================
-            // CONCURRENCIA
-            // =========================
-            builder.Property(l => l.row_version)
-                   .IsRowVersion()
-                   .IsConcurrencyToken();
 
             // =========================
             // INTEGRACIÓN / ORIGEN
             // =========================
             builder.Property(l => l.origen_registro)
                    .IsRequired()
-                   .HasMaxLength(20)
-                   .IsUnicode(false);
+                   .HasMaxLength(20);
+            // IsUnicode(false) eliminado
 
             // =========================
             // ÍNDICES / UNIQUE

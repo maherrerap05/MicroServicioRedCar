@@ -16,7 +16,7 @@ namespace MicroServicio.RedCar.DataAccess.Entities
         // =========================
         // IDENTIFICACIÓN
         // =========================
-        public Guid rol_guid { get; set; }
+        public Guid rol_guid { get; set; } = Guid.NewGuid();
 
         public string nombre_rol { get; set; } = null!;
         public string? descripcion_rol { get; set; }
@@ -40,7 +40,7 @@ namespace MicroServicio.RedCar.DataAccess.Entities
         // =========================
         // CONCURRENCIA
         // =========================
-        public byte[] row_version { get; set; } = null!;
+        
 
         // =========================
         // RELACIONES

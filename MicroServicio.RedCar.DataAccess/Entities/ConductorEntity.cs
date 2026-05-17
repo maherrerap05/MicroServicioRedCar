@@ -16,7 +16,7 @@ namespace MicroServicio.RedCar.DataAccess.Entities
         // =========================
         // CAMPOS PRINCIPALES
         // =========================
-        public Guid conductor_guid { get; set; }
+        public Guid conductor_guid { get; set; } = Guid.NewGuid();
 
         public string codigo_conductor { get; set; } = null!;
 
@@ -59,7 +59,7 @@ namespace MicroServicio.RedCar.DataAccess.Entities
         // =========================
         // CONCURRENCIA
         // =========================
-        public byte[] row_version { get; set; } = null!;
+        
 
         // =========================
         // INTEGRACIÓN / ORIGEN

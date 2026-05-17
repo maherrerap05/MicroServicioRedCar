@@ -35,8 +35,6 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
 
                 fecha_inhabilitacion_utc = entity.fecha_inhabilitacion_utc,
                 motivo_inhabilitacion = entity.motivo_inhabilitacion,
-
-                row_version = entity.row_version,
                 origen_registro = entity.origen_registro
             };
         }
@@ -46,7 +44,7 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
             return new LocalizacionEntity
             {
                 id_localizacion = model.id_localizacion,
-                localizacion_guid = model.localizacion_guid,
+                localizacion_guid = model.localizacion_guid == Guid.Empty ? Guid.NewGuid() : model.localizacion_guid,
 
                 codigo_localizacion = model.codigo_localizacion,
                 nombre_localizacion = model.nombre_localizacion,
@@ -71,8 +69,6 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
 
                 fecha_inhabilitacion_utc = model.fecha_inhabilitacion_utc,
                 motivo_inhabilitacion = model.motivo_inhabilitacion,
-
-                row_version = model.row_version,
                 origen_registro = model.origen_registro
             };
         }

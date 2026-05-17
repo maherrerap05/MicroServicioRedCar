@@ -12,7 +12,7 @@ namespace MicroServicio.RedCar.DataAccess.Entities
         // =========================
         // CAMPOS PRINCIPALES
         // =========================
-        public Guid localizacion_guid { get; set; }
+        public Guid localizacion_guid { get; set; } = Guid.NewGuid();
 
         public string codigo_localizacion { get; set; } = null!;
         public string nombre_localizacion { get; set; } = null!;
@@ -50,7 +50,7 @@ namespace MicroServicio.RedCar.DataAccess.Entities
         // =========================
         // CONCURRENCIA
         // =========================
-        public byte[] row_version { get; set; } = null!;
+        
 
         // =========================
         // INTEGRACIÓN / ORIGEN

@@ -46,8 +46,6 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
 
                 fecha_inhabilitacion_utc = entity.fecha_inhabilitacion_utc,
                 motivo_inhabilitacion = entity.motivo_inhabilitacion,
-
-                row_version = entity.row_version,
                 origen_registro = entity.origen_registro
             };
         }
@@ -60,7 +58,7 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
             return new ConductorEntity
             {
                 id_conductor = model.id_conductor,
-                conductor_guid = model.conductor_guid,
+                conductor_guid = model.conductor_guid == Guid.Empty ? Guid.NewGuid() : model.conductor_guid,
 
                 codigo_conductor = model.codigo_conductor,
 
@@ -93,8 +91,6 @@ namespace MicroServicio.RedCar.DataManagement.Mappers
 
                 fecha_inhabilitacion_utc = model.fecha_inhabilitacion_utc,
                 motivo_inhabilitacion = model.motivo_inhabilitacion,
-
-                row_version = model.row_version,
                 origen_registro = model.origen_registro
             };
         }
